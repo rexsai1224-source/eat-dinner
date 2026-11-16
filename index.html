@@ -1,0 +1,2053 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>今天晚餐吃什麼 - 第15組牧場像素廚房</title>
+<style>
+:root{
+  --cream:#fdf6e7;--parchment:#f4e6c8;--parchment-dark:#e5cfa4;
+  --olive-light:#c8b48a;--olive:#8c744c;--ink:#422718;--ink-soft:#75543e;
+  --orange:#e67e28;--red:#d94a3f;--green:#529e44;--blue:#4b83b5;--purple:#7e4aa8;
+  --font:"PingFang TC","Microsoft JhengHei","Noto Sans TC",monospace,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background-color:#d4b48c;
+  background-image:
+    repeating-linear-gradient(0deg,rgba(66,39,24,.07) 0 2px,transparent 2px 26px),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.08) 0 4px,transparent 4px 60px);
+  font-family:var(--font);color:var(--ink);padding:8px;
+}
+button{font-family:var(--font);cursor:pointer;color:var(--ink);font-weight:800}
+button:disabled{cursor:not-allowed;opacity:.5}
+.px-art{display:block;image-rendering:pixelated;image-rendering:crisp-edges}
+
+/* 可愛圓潤 16-bit 掌機外殼（手機單欄 / 電腦雙欄自適應） */
+.phone{
+  position:relative;width:404px;max-width:100%;height:min(820px,calc(100vh - 16px));min-height:680px;
+  background:var(--cream);border:4px solid var(--ink);border-radius:20px;
+  box-shadow:0 0 0 4px var(--olive-light),0 0 0 8px var(--ink),10px 12px 0 6px rgba(66,39,24,.32);
+  display:flex;flex-direction:column;overflow:hidden;transition:width .25s ease;
+}
+.bezel{
+  height:24px;background:var(--parchment-dark);border-bottom:3px solid var(--ink);
+  display:flex;align-items:center;justify-content:space-between;padding:0 14px;
+  font-size:10px;font-weight:900;letter-spacing:.8px;color:var(--ink-soft);
+}
+.bezel-right{display:flex;align-items:center;gap:8px}
+.bgm-toggle{
+  padding:2px 8px;border:2px solid var(--ink);border-radius:999px;background:#fff9eb;
+  font-size:10px;line-height:1.1;box-shadow:1px 1px 0 var(--ink);
+}
+.bgm-toggle.on{background:#e1f5dc;color:#234d1c}
+.led{width:9px;height:9px;background:var(--green);border:2px solid var(--ink);border-radius:50%;display:inline-block}
+.led.hot{background:var(--red);animation:blink .35s steps(2) infinite}
+@keyframes blink{50%{opacity:.25}}
+
+.screen{
+  flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 10px 10px;
+  background:var(--cream);display:flex;flex-direction:column;scrollbar-width:none;position:relative;
+}
+.screen::-webkit-scrollbar{display:none}
+.parchment-box{
+  position:relative;overflow:hidden;
+  flex:1;border:3px solid var(--ink);border-radius:14px;
+  box-shadow:inset 0 0 0 3px var(--parchment-dark);
+  background:rgba(253,246,231,.92);padding:9px;display:flex;flex-direction:column;
+}
+
+/* 溫馨像素廚房背景插畫層（柔和淡化，不干擾操作） */
+.kitchen-wallpaper{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  opacity:.24;pointer-events:none;z-index:0;image-rendering:pixelated;
+}
+.views-wrap{
+  display:flex;flex-direction:column;flex:1;position:relative;z-index:2;min-height:0;
+}
+.view{display:none;flex-direction:column;flex:1;position:relative;z-index:2;min-height:0}
+.view.active{display:flex;animation:popIn .2s steps(3)}
+@keyframes popIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* 電腦版寬螢幕（>=900px）：左右雙欄同時顯示烹飪區與上菜區 */
+@media (min-width:900px){
+  .phone{
+    width:868px;height:min(810px,calc(100vh - 20px));
+  }
+  .views-wrap{
+    display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch;
+  }
+  .view{
+    display:flex !important;
+  }
+  #serveView{
+    border-left:3px dashed rgba(66,39,24,.35);
+    padding-left:14px;
+  }
+}
+
+/* 頂部標題區（保留原版圓形Logo、COOK廚師帽、地點、圖鑑按鈕） */
+.top-row{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.logo-circle{
+  width:46px;height:46px;flex:none;border:3px solid var(--ink);border-radius:50%;
+  background:#fff8e8;box-shadow:inset -2px 2px 0 var(--parchment-dark),2px 3px 0 var(--ink);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
+.logo-circle .px-art{width:34px;height:34px}
+.title-center{flex:1;text-align:center}
+.cook-sub{
+  display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:900;
+  color:var(--olive);letter-spacing:1px;background:#fff8e8;padding:1px 8px;
+  border:2px solid var(--ink);border-radius:999px;
+}
+.cook-sub .px-art{width:15px;height:15px}
+.main-title{font-size:18px;font-weight:900;letter-spacing:1px;text-shadow:2px 2px 0 var(--parchment-dark);cursor:pointer;margin-top:2px}
+.loc-btn{
+  margin-top:3px;padding:3px 10px;border:2.5px solid var(--ink);border-radius:999px;background:#fff9ec;
+  box-shadow:2px 2px 0 var(--ink);font-size:11px;display:inline-flex;align-items:center;gap:4px;
+}
+.loc-btn:active{transform:translate(1px,1px);box-shadow:none}
+.book-btn{
+  height:40px;padding:0 10px;flex:none;border:3px solid var(--ink);border-radius:12px;background:#ffe9c2;
+  box-shadow:inset -2px 2px 0 #e6bd7a,inset 2px 2px 0 #fff,2px 3px 0 var(--ink);
+  font-size:12px;display:flex;align-items:center;gap:4px;
+}
+.book-btn:active{transform:translate(2px,2px);box-shadow:none}
+
+/* 實線引導提示框 */
+.hint-bar{
+  margin-top:7px;padding:6px 9px;border:2.5px solid var(--ink);border-radius:10px;background:#fffcf2;
+  box-shadow:2px 2px 0 var(--ink);font-size:11.5px;font-weight:800;text-align:center;line-height:1.35;
+}
+.hint-bar.orange{background:#fde7c2;border-color:var(--ink);color:#7c3a06}
+.hint-bar.green{background:#dff2d8;border-color:var(--ink);color:#1f4d18}
+.hint-bar.red{background:#fad7d4;border-color:var(--ink);color:#7a1c15}
+
+/* 上排 4 格不重複 Jackpot 拉霸架（僅能點擊此處選取與取消食材） */
+.shelf{
+  margin-top:8px;padding:7px;background:rgba(244,230,200,.92);border:3px solid var(--ink);
+  border-radius:14px;box-shadow:inset 0 2px 0 #fff8e6,2px 3px 0 var(--ink);
+}
+.reels-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.reel{
+  --h:82px;height:var(--h);border:3px solid var(--ink);border-radius:12px;background:#fffef9;
+  box-shadow:inset 0 -3px 0 var(--parchment-dark),2px 3px 0 var(--ink);
+  overflow:hidden;position:relative;cursor:pointer;user-select:none;transition:transform .12s,background .12s;
+}
+.reel:hover{background:#fff;transform:translateY(-2px)}
+.reel.selected{
+  background:#e4f7dc;border-color:#265e1d;
+  box-shadow:inset 0 0 0 2.5px var(--green),2px 3px 0 var(--ink);
+}
+.reel.selected::after{
+  content:"✓已放";position:absolute;top:2px;right:3px;background:var(--green);color:#fff;
+  font-size:9px;font-weight:900;padding:1px 5px;border:1.5px solid var(--ink);border-radius:999px;z-index:3;
+}
+.strip{will-change:transform;transition:transform .78s cubic-bezier(.16,.88,.28,1.03)}
+.strip.instant{transition:none}
+.cell{height:var(--h);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.cell .px-art{width:48px;height:48px}
+.cell span{
+  font-size:10.5px;font-weight:900;background:#fff4d9;border:1.5px solid var(--ink);
+  border-radius:999px;padding:0 6px;line-height:1.25;
+}
+.cell.mystery-cell .q-mark{
+  width:44px;height:44px;border:2.5px dashed var(--olive);border-radius:12px;
+  background:#fff8e6;display:flex;align-items:center;justify-content:center;
+  font-size:24px;font-weight:900;color:var(--olive);
+}
+
+/* 中央主舞台：可愛大拉桿 + 圓潤大燉鍋 + 溫度計與實線開關 */
+.stage{
+  flex:1;margin-top:8px;display:grid;grid-template-columns:56px 1fr 66px;
+  gap:6px;align-items:center;min-height:282px;
+}
+.lever-col{display:flex;flex-direction:column;align-items:center;gap:6px}
+.lever-btn{
+  width:52px;height:164px;border:3px solid var(--ink);border-radius:16px;background:#fff3d6;
+  box-shadow:inset -3px 3px 0 var(--parchment-dark),inset 2px 2px 0 #fff,3px 3px 0 var(--ink);
+  position:relative;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:10px 0;
+}
+.lever-btn:active{transform:translate(1px,1px)}
+.lever-track{position:absolute;top:20px;bottom:20px;width:12px;background:#7d5e49;border:2.5px solid var(--ink);border-radius:999px}
+.lever-knob{
+  position:relative;z-index:2;width:34px;height:34px;border-radius:50%;
+  background:radial-gradient(circle at 34% 30%,#ffb3aa,var(--red) 72%);
+  border:3px solid var(--ink);box-shadow:0 2px 0 var(--ink);transition:transform .35s steps(5);
+}
+.lever-btn.pulling .lever-knob{transform:translateY(104px)}
+.lever-tag{
+  font-size:10.5px;font-weight:900;text-align:center;line-height:1.2;color:var(--ink);
+  background:#fff8e8;border:2px solid var(--ink);border-radius:8px;padding:2px 5px;
+}
+
+.pot-stage{
+  height:100%;border:none;background:transparent;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  position:relative;padding:2px;
+}
+.steam-box{height:28px;display:flex;gap:18px;align-items:flex-end;opacity:0;transition:opacity .2s}
+.pot-unit.cooking .steam-box{opacity:1}
+.steam-puff{width:13px;height:13px;background:#fff;border:2.5px solid var(--ink);border-radius:50%;animation:steamUp 1.1s steps(4) infinite}
+.steam-puff:nth-child(2){animation-delay:.35s;width:16px;height:16px}
+.steam-puff:nth-child(3){animation-delay:.7s}
+.pot-unit.burnt .steam-puff{background:#3a353f;border-color:var(--ink)}
+@keyframes steamUp{0%{transform:translateY(8px);opacity:.95}100%{transform:translateY(-20px);opacity:0}}
+.pot-unit{display:flex;flex-direction:column;align-items:center;position:relative}
+.pot-lid-wrap{width:176px;height:54px;z-index:3;transition:transform .42s cubic-bezier(.34,1.56,.64,1);transform-origin:14px 44px}
+.pot-lid-wrap .px-art{width:100%;height:100%}
+.pot-unit.cooking .pot-lid-wrap{animation:lidBounce .42s steps(2) infinite alternate}
+@keyframes lidBounce{from{transform:translateY(0)}to{transform:translateY(-4px) rotate(-2deg)}}
+.pot-unit.opening .pot-lid-wrap{transform:translate(-18px,-30px) rotate(-26deg)}
+.pot-burst{
+  position:absolute;top:16px;width:130px;height:52px;pointer-events:none;opacity:0;z-index:4;
+  background:radial-gradient(circle,rgba(255,243,148,.95) 0%,rgba(255,194,107,.55) 45%,transparent 72%);
+}
+.pot-unit.opening .pot-burst{animation:burstPop .45s steps(3) forwards}
+@keyframes burstPop{0%{opacity:0;transform:scale(.5)}45%{opacity:1;transform:scale(1.15)}100%{opacity:0;transform:scale(1.3)}}
+
+.pot-body-wrap{width:176px;height:116px;margin-top:-9px;position:relative;z-index:2}
+.pot-body-wrap .px-art{width:100%;height:100%}
+.pot-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-top:10px;pointer-events:none}
+.pot-icons{display:grid;grid-template-columns:repeat(2,34px);gap:3px;min-height:70px;align-items:center;justify-items:center}
+.pot-icons .px-art{width:34px;height:34px;animation:dropIn .24s steps(3)}
+@keyframes dropIn{from{transform:translateY(-14px) scale(1.2);opacity:0}to{transform:none;opacity:1}}
+.pot-unit.shake{animation:potShake .26s steps(2) infinite}
+.pot-unit.sizzle{animation:potShake .12s steps(2) infinite}
+@keyframes potShake{0%{transform:translateX(-2.5px)}100%{transform:translateX(2.5px)}}
+.pot-unit.burnt .pot-body-wrap .px-art,
+.pot-unit.burnt .pot-lid-wrap .px-art{filter:grayscale(1) brightness(.22) contrast(1.4)}
+.pot-unit.burnt .pot-icons .px-art{filter:grayscale(1) brightness(.18) contrast(1.5)}
+.pot-unit.warn .pot-body-wrap{animation:blink .28s steps(2) infinite}
+
+.stove-base{
+  width:214px;height:40px;margin-top:-5px;z-index:1;background:#68737d;border:3px solid var(--ink);
+  border-radius:10px;box-shadow:inset 0 4px 0 #9aa6b2,3px 3px 0 var(--ink);
+  display:flex;align-items:center;justify-content:center;gap:16px;
+}
+.flame{width:16px;height:16px;background:var(--orange);border:2px solid var(--ink);border-radius:3px;transform:rotate(45deg);opacity:.22}
+.pot-unit.cooking .flame{opacity:1;background:#ffd447;box-shadow:0 0 0 2.5px var(--red);animation:flameFlicker .2s steps(2) infinite alternate}
+@keyframes flameFlicker{from{transform:rotate(45deg) scale(.92)}to{transform:rotate(45deg) scale(1.22)}}
+
+/* 右側溫度計與實線開關火按鈕 */
+.right-col{display:flex;flex-direction:column;align-items:center;gap:9px}
+.thermo-box{
+  width:58px;border:3px solid var(--ink);border-radius:14px;background:#fff6e0;
+  box-shadow:inset -2px 2px 0 var(--parchment-dark),3px 3px 0 var(--ink);
+  padding:6px 0;display:flex;flex-direction:column;align-items:center;gap:4px;
+}
+.thermo-tube{width:24px;height:112px;border:2.5px solid var(--ink);border-radius:999px;background:#fffef9;position:relative;overflow:hidden}
+.thermo-fill{position:absolute;left:0;right:0;bottom:0;height:0%;background:#f5b82e;transition:height .2s linear,background .2s}
+.thermo-box.ready .thermo-fill{background:var(--green)}
+.thermo-box.hot .thermo-fill{background:var(--red)}
+.line-burn{position:absolute;left:0;right:0;top:10%;border-top:2px solid var(--red)}
+.line-done{position:absolute;left:0;right:0;top:25%;border-top:2px solid var(--green)}
+.thermo-txt{font-size:11px;font-weight:900}
+
+.fire-switch{
+  width:58px;height:66px;border:3px solid var(--ink);border-radius:14px;background:#dfe6ed;
+  box-shadow:inset -2px 2px 0 #9aa6b2,3px 3px 0 var(--ink);
+  display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:5px 2px;
+  font-size:11px;font-weight:900;
+}
+.fire-switch .knob{width:40px;height:20px;background:#fff;border:2.5px solid var(--ink);border-radius:8px}
+.fire-switch.on{background:var(--red);color:#fff;box-shadow:inset 2px 2px 0 #8c231c,3px 3px 0 var(--ink)}
+.fire-switch.on .knob{order:-1;background:#ffdf73}
+
+/* 底部實線操作按鈕區 */
+.bottom-btns{margin-top:8px;display:grid;grid-template-columns:1fr 1.35fr;gap:9px}
+.px-btn{
+  height:48px;border:3px solid var(--ink);border-radius:14px;background:#fff2d6;
+  box-shadow:inset -2px 2px 0 var(--parchment-dark),inset 2px 2px 0 #fff,3px 3px 0 var(--ink);
+  font-size:15px;font-weight:900;letter-spacing:1px;
+}
+.px-btn:active:not(:disabled){transform:translate(2px,2px);box-shadow:none}
+.px-btn.plate{background:#e4f2dc;color:#1f4d18}
+.px-btn.plate.ready{background:var(--green);color:#fff;animation:pulseBtn .65s steps(2) infinite alternate}
+@keyframes pulseBtn{from{transform:scale(1)}to{transform:scale(1.03)}}
+
+/* ===== 第二畫面：Gacha 轉蛋發光大圓盤料理展示 ===== */
+.serve-top{margin-top:6px;display:flex;justify-content:flex-start}
+.rating-box{
+  padding:7px 14px;border:3px solid var(--ink);border-radius:14px;background:#dff2d8;
+  box-shadow:3px 3px 0 var(--ink);display:inline-flex;flex-direction:column;align-items:flex-start;gap:2px;
+  transition:background .2s;
+}
+.rating-box.mystery{background:#f4e6c8}
+.rating-box.death{background:#3b3640;color:#f4f0f8}
+.serve-status-line{
+  font-size:13px;font-weight:900;color:#1f4d18;line-height:1.2;letter-spacing:.3px;
+}
+.rating-box.mystery .serve-status-line{color:var(--ink-soft)}
+.rating-box.death .serve-status-line{color:#ffd666}
+.stars-row{font-size:18px;letter-spacing:2px;color:#f5a623;text-shadow:1.5px 1.5px 0 var(--ink);line-height:1.15}
+.stars-row.mystery{color:var(--ink-soft);text-shadow:none;letter-spacing:3px;font-weight:900;font-size:15px}
+
+.plate-showcase{
+  flex:1;min-height:290px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:2px 0;position:relative;
+}
+.gacha-aura{
+  position:absolute;width:316px;height:316px;border-radius:50%;
+  background:repeating-conic-gradient(from 0deg,rgba(255,222,102,.65) 0deg 14deg,rgba(255,255,255,0) 14deg 28deg);
+  animation:spinRays 9s linear infinite;pointer-events:none;transition:opacity .25s;
+}
+.gacha-aura.hidden{opacity:0}
+.gacha-aura.death{
+  background:repeating-conic-gradient(from 0deg,rgba(75,68,83,.55) 0deg 14deg,rgba(255,255,255,0) 14deg 28deg);
+}
+@keyframes spinRays{to{transform:rotate(360deg)}}
+.pure-plate{position:relative;z-index:2;width:270px;height:270px;display:flex;align-items:center;justify-content:center}
+.pure-plate .px-art{width:264px;height:264px;animation:dishPop .45s cubic-bezier(.34,1.56,.64,1)}
+.pure-plate.empty-plate{
+  width:210px;height:210px;border:3.5px dashed var(--olive);border-radius:50%;
+  background:rgba(255,253,245,.75);box-shadow:inset 0 0 0 12px rgba(244,230,200,.6);
+}
+.empty-plate-hint{
+  font-size:13px;font-weight:900;color:var(--olive);letter-spacing:1px;
+  background:#fff8e8;padding:4px 12px;border:2px solid var(--olive);border-radius:999px;
+}
+@keyframes dishPop{0%{transform:scale(.35) rotate(-8deg);opacity:0}75%{transform:scale(1.06) rotate(2deg)}100%{transform:none;opacity:1}}
+.used-ingredients{
+  position:relative;z-index:2;margin-top:4px;padding:4px 10px;border:2px solid var(--ink);
+  border-radius:999px;background:rgba(255,253,247,.92);display:flex;align-items:center;gap:6px;
+}
+.used-ingredients.hidden{display:none}
+.used-ingredients .px-art{width:24px;height:24px}
+
+.dialog-card{
+  border:3px solid var(--ink);border-radius:16px;background:rgba(255,253,247,.96);
+  box-shadow:inset 0 0 0 2.5px var(--parchment-dark),3px 4px 0 var(--ink);
+  padding:10px 12px;display:flex;flex-direction:column;gap:6px;
+}
+.dish-head{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap}
+.cuisine-tag{
+  padding:3px 10px;border:2.5px solid var(--ink);border-radius:999px;
+  background:#ffe2b3;color:#7c3a06;font-size:11.5px;font-weight:900;
+}
+.cuisine-tag.death{background:#3b3640;color:#f8f2e6}
+.cuisine-tag.mystery{background:#f4e6c8;color:var(--ink-soft)}
+.kcal-badge{
+  padding:3px 10px;border:2.5px solid var(--ink);border-radius:999px;
+  background:#fad7d4;color:#8c1d18;font-size:11.5px;font-weight:900;
+}
+.kcal-badge.mystery{background:#f4e6c8;color:var(--ink-soft)}
+.dish-name{font-size:18px;font-weight:900;letter-spacing:.5px}
+.dish-desc{font-size:12px;line-height:1.48;color:var(--ink-soft);font-weight:700}
+.dialog-actions{display:grid;grid-template-columns:1fr 1.25fr;gap:8px;margin-top:4px}
+.map-link{
+  height:44px;border:3px solid var(--ink);border-radius:14px;background:#dce9f7;color:#1c4366;
+  box-shadow:inset -2px 2px 0 #9dbad9,inset 2px 2px 0 #fff,2px 3px 0 var(--ink);text-decoration:none;
+  font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:4px;
+}
+.map-link.disabled{
+  pointer-events:none;opacity:.48;background:#e9e4d8;color:var(--ink-soft);
+}
+.map-link:active{transform:translate(2px,2px);box-shadow:none}
+
+/* 彈窗：地區設定 & 可新增/刪除食譜圖鑑 */
+.modal-mask{
+  position:absolute;inset:0;background:rgba(66,39,24,.65);z-index:50;
+  display:none;align-items:center;justify-content:center;padding:10px;
+}
+.modal-mask.open{display:flex}
+.modal-box{
+  width:100%;max-height:92%;background:var(--cream);border:4px solid var(--ink);border-radius:18px;
+  box-shadow:6px 6px 0 var(--ink);padding:10px;display:flex;flex-direction:column;gap:8px;
+}
+.modal-head{display:flex;align-items:center;justify-content:space-between;border-bottom:2.5px solid var(--ink);padding-bottom:6px;gap:6px}
+.modal-title{font-size:14.5px;font-weight:900}
+.head-tools{display:flex;align-items:center;gap:5px}
+.mini-action-btn{
+  padding:4px 8px;border:2px solid var(--ink);border-radius:999px;background:#dff2d8;
+  color:#1f4d18;font-size:11px;box-shadow:1px 1px 0 var(--ink);
+}
+.mini-action-btn.reset{background:#fff3d6;color:var(--ink)}
+.close-x{width:30px;height:30px;border:2.5px solid var(--ink);border-radius:10px;background:#ffe3dc;font-size:13px}
+.filter-bar{display:flex;flex-wrap:wrap;gap:4px}
+.filter-btn{padding:3px 8px;border:2px solid var(--ink);border-radius:999px;background:var(--parchment);font-size:11px}
+.filter-btn.active{background:var(--orange);color:#fff}
+.modal-body{overflow-y:auto;display:flex;flex-direction:column;gap:7px;padding-right:2px}
+.loc-input,.form-input,.form-select{
+  width:100%;height:36px;border:2.5px solid var(--ink);border-radius:10px;background:#fffdf7;padding:0 8px;
+  font-family:var(--font);font-size:12.5px;font-weight:700;color:var(--ink);
+}
+.preset-chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{padding:4px 9px;border:2px solid var(--ink);border-radius:999px;background:var(--parchment);font-size:11px}
+
+.add-form{
+  border:2.5px solid var(--ink);border-radius:12px;background:#fff9e6;padding:8px;
+  display:none;flex-direction:column;gap:6px;
+}
+.add-form.open{display:flex}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.ing-picker{display:flex;flex-wrap:wrap;gap:4px}
+.ing-pick-btn{
+  padding:3px 7px;border:2px solid var(--ink);border-radius:999px;background:#fffdf7;font-size:10.5px;
+}
+.ing-pick-btn.picked{background:var(--green);color:#fff}
+
+.recipe-row{
+  border:2.5px solid var(--ink);border-radius:12px;background:var(--parchment);padding:6px 7px;
+  display:flex;align-items:center;gap:8px;position:relative;
+}
+.recipe-row .px-art{width:48px;height:48px;flex:none}
+.recipe-meta{font-size:11px;line-height:1.35;flex:1}
+.recipe-meta strong{font-size:12.5px;display:block;margin-bottom:2px;padding-right:44px}
+.recipe-tags{display:flex;gap:4px;margin-bottom:2px;flex-wrap:wrap}
+.mini-tag{padding:1px 6px;border:1.5px solid var(--ink);border-radius:999px;background:#fffdf7;font-size:10px;font-weight:800}
+.mini-tag.kcal{background:#fad7d4;color:#8c1d18}
+.del-recipe-btn{
+  position:absolute;top:6px;right:6px;padding:2px 6px;border:1.5px solid var(--ink);border-radius:8px;
+  background:#fad7d4;color:#7a1c15;font-size:10px;
+}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="bezel">
+    <span>MINERAL KITCHEN 16-BIT</span>
+    <div class="bezel-right">
+      <button class="bgm-toggle" id="bgmBtn" type="button" title="切換輕鬆背景音樂與音效">♪ BGM 關</button>
+      <span><i class="led" id="powerLed"></i> POWER</span>
+    </div>
+  </div>
+  <div class="screen">
+      <!-- 溫馨像素廚房背景插畫（柔和淡化，不干擾操作） -->
+      <img class="kitchen-wallpaper" id="kitchenBgImg" alt="溫馨像素廚房背景">
+
+      <div class="views-wrap">
+      <!-- 第一畫面：主烹飪畫面 -->
+      <section class="view active" id="cookView">
+        <header class="top-row">
+          <div class="logo-circle" id="logoChef" title="牧場像素廚房"></div>
+          <div class="title-center">
+            <div class="cook-sub"><span id="miniHat"></span> 第15組 COOK</div>
+            <h1 class="main-title" id="quickCookTitle" title="點擊一鍵隨機轉盤">今天晚餐吃什麼</h1>
+            <button class="loc-btn" id="openLocBtn" type="button">📍 <span id="locText">台北市文山區</span></button>
+          </div>
+          <button class="book-btn" id="openBookBtn" type="button">📖 圖鑑</button>
+        </header>
+
+        <div class="hint-bar" id="hintBar">拉動左側拉桿轉出 4 種不同食材，點擊上方食材格放入燉鍋！</div>
+
+        <div class="shelf"><div class="reels-grid" id="reelsGrid"></div></div>
+
+        <div class="stage">
+          <div class="lever-col">
+            <button class="lever-btn" id="leverBtn" type="button" aria-label="拉動食材拉桿">
+              <div class="lever-track"></div>
+              <div class="lever-knob"></div>
+            </button>
+            <div class="lever-tag">拉動<br>轉盤</div>
+          </div>
+
+          <div class="pot-stage" id="potDropZone">
+            <div class="pot-unit" id="potUnit">
+              <div class="pot-burst"></div>
+              <div class="steam-box">
+                <span class="steam-puff"></span><span class="steam-puff"></span><span class="steam-puff"></span>
+              </div>
+              <div class="pot-lid-wrap" id="potLidArt"></div>
+              <div class="pot-body-wrap">
+                <div id="potBodyArt"></div>
+                <div class="pot-overlay">
+                  <div class="pot-icons" id="potIcons"></div>
+                </div>
+              </div>
+              <div class="stove-base">
+                <span class="flame"></span><span class="flame"></span><span class="flame"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="right-col">
+            <div class="thermo-box" id="thermoBox">
+              <span class="thermo-txt" id="tempVal">0°</span>
+              <div class="thermo-tube">
+                <div class="line-burn" title="100% 燒焦死神線"></div>
+                <div class="line-done" title="75% 黃金熟度線"></div>
+                <div class="thermo-fill" id="thermoFill"></div>
+              </div>
+              <span class="thermo-txt">熟度</span>
+            </div>
+            <button class="fire-switch" id="fireBtn" type="button">
+              <span>關火</span><div class="knob"></div><span>開火</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="bottom-btns">
+          <button class="px-btn" id="resetBtn" type="button">清空重來</button>
+          <button class="px-btn plate" id="serveBtn" type="button" disabled>起鍋盛盤</button>
+        </div>
+      </section>
+
+      <!-- 第二畫面：Gacha 轉蛋發光大圓盤料理展示（電腦版預設為 ??? 待上菜空盤狀態） -->
+      <section class="view" id="serveView">
+        <header class="top-row">
+          <div class="logo-circle" id="serveLogoChef"></div>
+          <div class="title-center" style="text-align:right">
+            <button class="loc-btn" id="serveLocBtn" type="button">📍 <span id="serveLocText">台北市文山區</span></button>
+          </div>
+        </header>
+
+        <div class="serve-top">
+          <div class="rating-box mystery" id="ratingBox">
+            <div class="serve-status-line" id="serveBadge">⏳ 等待出鍋</div>
+            <div class="stars-row mystery" id="starRating">???</div>
+          </div>
+        </div>
+
+        <div class="plate-showcase">
+          <div class="gacha-aura hidden" id="gachaAura"></div>
+          <div class="pure-plate empty-plate" id="purePlateArt"><span class="empty-plate-hint">空盤待上菜</span></div>
+          <div class="used-ingredients hidden" id="usedIngRow"></div>
+        </div>
+
+        <div class="dialog-card">
+          <div class="dish-head">
+            <span class="cuisine-tag mystery" id="resCuisine">????</span>
+            <span class="kcal-badge mystery" id="resKcal">🔥 熱量：??? kcal</span>
+          </div>
+          <h2 class="dish-name" id="resDishName">????</h2>
+          <p class="dish-desc" id="resDishDesc">將左側食材放入燉鍋並開火烹調，點擊「起鍋盛盤」即可揭曉今晚的美味料理！</p>
+          <div class="dialog-actions">
+            <button class="px-btn" id="backCookBtn" type="button">再煮一鍋</button>
+            <a class="map-link disabled" id="mapSearchLink" href="#" target="_blank" rel="noopener noreferrer">🗺️ 搜尋附近餐廳</a>
+          </div>
+        </div>
+      </section>
+      </div>
+    </div>
+
+    <!-- 地區設定彈窗 -->
+    <div class="modal-mask" id="locModal">
+      <div class="modal-box">
+        <div class="modal-head">
+          <span class="modal-title">📍 設定搜尋地點</span>
+          <button class="close-x" id="closeLocBtn" type="button">✕</button>
+        </div>
+        <div class="modal-body">
+          <input class="loc-input" id="locInput" type="text" placeholder="輸入地區或地標（如：台北市文山區）">
+          <div class="preset-chips">
+            <button class="chip" type="button" data-loc="台北市文山區">台北市文山區</button>
+            <button class="chip" type="button" data-loc="國立政治大學">國立政治大學</button>
+            <button class="chip" type="button" data-loc="台北市大安區">台北市大安區</button>
+            <button class="chip" type="button" data-loc="台北市信義區">台北市信義區</button>
+            <button class="chip" type="button" data-loc="新北市板橋區">新北市板橋區</button>
+            <button class="chip" type="button" data-loc="台中市西屯區">台中市西屯區</button>
+          </div>
+          <button class="px-btn plate" id="saveLocBtn" type="button" style="height:40px;font-size:13px;margin-top:4px">確認儲存地點</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 食譜圖鑑彈窗（支援新增料理與刪除料理） -->
+    <div class="modal-mask" id="bookModal">
+      <div class="modal-box">
+        <div class="modal-head">
+          <span class="modal-title" id="bookCountTitle">📖 料理圖鑑</span>
+          <div class="head-tools">
+            <button class="mini-action-btn" id="toggleAddFormBtn" type="button">＋新增料理</button>
+            <button class="mini-action-btn reset" id="restoreBookBtn" type="button">↺ 恢復預設</button>
+            <button class="close-x" id="closeBookBtn" type="button">✕</button>
+          </div>
+        </div>
+
+        <div class="add-form" id="addDishForm">
+          <div class="form-row">
+            <input class="form-input" id="newDishTitle" type="text" placeholder="輸入新料理名稱">
+            <select class="form-select" id="newDishCuisine">
+              <option value="日式料理">日式料理</option>
+              <option value="台式料理">台式料理</option>
+              <option value="韓式料理">韓式料理</option>
+              <option value="美式料理">美式料理</option>
+              <option value="義式料理">義式料理</option>
+              <option value="港式料理">港式料理</option>
+              <option value="泰式料理">泰式料理</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <input class="form-input" id="newDishKcal" type="number" value="650" placeholder="熱量 (kcal)">
+            <select class="form-select" id="newDishSprite">
+              <option value="dish_curry">圖示：濃郁咖哩飯</option>
+              <option value="dish_oyakodon">圖示：和風蓋飯</option>
+              <option value="dish_ramen">圖示：日式拉麵</option>
+              <option value="dish_hotpot">圖示：暖心土鍋</option>
+              <option value="dish_salmon_set">圖示：日式定食</option>
+              <option value="dish_bibimbap">圖示：石鍋拌飯</option>
+              <option value="dish_kchicken">圖示：香酥炸物拼盤</option>
+              <option value="dish_luroufan">圖示：古早味滷肉飯</option>
+              <option value="dish_sanbei">圖示：三杯砂鍋煲</option>
+              <option value="dish_burger_steak">圖示：美式漢堡排</option>
+              <option value="dish_pasta">圖示：義大利麵</option>
+              <option value="dish_gratin">圖示：黃金焗烤飯</option>
+            </select>
+          </div>
+          <div style="font-size:10.5px;font-weight:900;color:var(--ink-soft)">點選此料理必備的食材（1～4種）：</div>
+          <div class="ing-picker" id="newDishIngPicker"></div>
+          <input class="form-input" id="newDishDesc" type="text" placeholder="料理特色簡介（選填）">
+          <button class="px-btn plate" id="saveNewDishBtn" type="button" style="height:36px;font-size:13px">儲存這道新料理</button>
+        </div>
+
+        <div class="filter-bar" id="filterBar">
+          <button class="filter-btn active" type="button" data-cat="ALL">全部</button>
+          <button class="filter-btn" type="button" data-cat="日式料理">日式</button>
+          <button class="filter-btn" type="button" data-cat="台式料理">台式</button>
+          <button class="filter-btn" type="button" data-cat="韓式料理">韓式</button>
+          <button class="filter-btn" type="button" data-cat="美式料理">美式</button>
+          <button class="filter-btn" type="button" data-cat="義式料理">義式</button>
+        </div>
+        <div class="modal-body" id="bookList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== 0. 輕柔可愛 16-bit 音樂盒 BGM 與像素操作音效引擎 ===== */
+const SoundFX = (() => {
+  let ctx = null;
+  let enabled = false;
+  let bgmTimer = null;
+  let step = 0;
+
+  // 舒緩可愛的八音盒節拍（低音量不刺耳）
+  const melody = [
+    523.25, 0, 659.25, 783.99, 659.25, 0, 587.33, 659.25,
+    523.25, 0, 440.00, 523.25, 392.00, 0, 440.00, 493.88,
+    523.25, 0, 659.25, 783.99, 880.00, 0, 783.99, 659.25,
+    587.33, 0, 659.25, 587.33, 523.25, 0, 0, 0
+  ];
+  const bass = [
+    261.63, 0, 196.00, 0, 220.00, 0, 174.61, 0,
+    261.63, 0, 196.00, 0, 196.00, 0, 246.94, 0,
+    261.63, 0, 196.00, 0, 220.00, 0, 174.61, 0,
+    196.00, 0, 196.00, 0, 261.63, 0, 0, 0
+  ];
+
+  function ensureCtx() {
+    if (!ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) ctx = new AudioCtx();
+    }
+    if (ctx && ctx.state === 'suspended') ctx.resume();
+  }
+
+  function tone(freq, dur, type = 'sine', vol = 0.03, delay = 0) {
+    if (!enabled || !ctx || !freq) return;
+    const now = ctx.currentTime + delay;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, now);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.linearRampToValueAtTime(vol, now + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + dur + 0.02);
+  }
+
+  function startBgmLoop() {
+    if (bgmTimer) return;
+    bgmTimer = setInterval(() => {
+      if (!enabled) return;
+      const m = melody[step % melody.length];
+      const b = bass[step % bass.length];
+      if (m) tone(m, 0.28, 'sine', 0.022);
+      if (b) tone(b, 0.34, 'triangle', 0.018);
+      step++;
+    }, 290);
+  }
+
+  function setEnabled(val) {
+    enabled = val;
+    const btn = document.getElementById('bgmBtn');
+    if (enabled) {
+      ensureCtx();
+      startBgmLoop();
+      if (btn) { btn.textContent = '♪ BGM 開'; btn.classList.add('on'); }
+    } else {
+      if (btn) { btn.textContent = '♪ BGM 關'; btn.classList.remove('on'); }
+    }
+  }
+
+  function autoUnlock() {
+    if (!enabled) setEnabled(true);
+  }
+
+  return {
+    toggle() { setEnabled(!enabled); },
+    autoUnlock,
+    click() { tone(660, 0.07, 'sine', 0.045); },
+    drop() { tone(440, 0.08, 'triangle', 0.06, 0); tone(659.25, 0.12, 'triangle', 0.06, 0.06); },
+    remove() { tone(523.25, 0.07, 'triangle', 0.05, 0); tone(392, 0.1, 'triangle', 0.05, 0.05); },
+    spinTick(i) { tone(480 + i * 75, 0.07, 'sine', 0.04); },
+    fireOn() { tone(330, 0.09, 'triangle', 0.05, 0); tone(493.88, 0.14, 'triangle', 0.05, 0.07); },
+    warn() { tone(880, 0.08, 'sine', 0.045, 0); tone(880, 0.08, 'sine', 0.045, 0.12); },
+    win() {
+      [523.25, 659.25, 783.99, 1046.5].forEach((f, idx) => tone(f, 0.22, 'triangle', 0.055, idx * 0.09));
+    },
+    death() {
+      [311.13, 277.18, 233.08, 185.0].forEach((f, idx) => tone(f, 0.24, 'sawtooth', 0.032, idx * 0.1));
+    }
+  };
+})();
+
+/* ===== 1. 高精細離屏 Canvas 16-bit 可愛像素渲染引擎 ===== */
+const PAL = {
+  k:'#422718', w:'#ffffff', w1:'#f8f2e6', w2:'#e4d6bc',
+  r1:'#ff9b8f', r2:'#e3594d', r3:'#b53328', r4:'#781d15',
+  o1:'#ffc26b', o2:'#ed832b', o3:'#bd5615',
+  y1:'#fff394', y2:'#f7c93e', y3:'#cf9417', y4:'#916009',
+  g1:'#a5e675', g2:'#5eb041', g3:'#357526', g4:'#1f4a16',
+  b1:'#96ccf2', b2:'#4e8ec4', b3:'#2b5982',
+  br1:'#d4965f', br2:'#a36534', br3:'#703f1a', br4:'#4a250c',
+  s1:'#d8dfe6', s2:'#a3aeb8', s3:'#68737d',
+  p1:'#c995ed', p2:'#8f50bd', p3:'#522475',
+  pk:'#ffb5c5'
+};
+const SPRITES = {};
+
+function makeSprite(w, h, fn) {
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const ctx = c.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  const px = (x, y, col) => {
+    if (!PAL[col] || x < 0 || y < 0 || x >= w || y >= h) return;
+    ctx.fillStyle = PAL[col];
+    ctx.fillRect(x | 0, y | 0, 1, 1);
+  };
+  const rect = (x, y, rw, rh, col) => {
+    if (!PAL[col]) return;
+    ctx.fillStyle = PAL[col];
+    ctx.fillRect(x | 0, y | 0, rw | 0, rh | 0);
+  };
+  const ell = (cx, cy, rx, ry, col) => {
+    for (let y = Math.floor(cy - ry - 1); y <= Math.ceil(cy + ry + 1); y++) {
+      for (let x = Math.floor(cx - rx - 1); x <= Math.ceil(cx + rx + 1); x++) {
+        if (((x + .5 - cx) / rx) ** 2 + ((y + .5 - cy) / ry) ** 2 <= 1) px(x, y, col);
+      }
+    }
+  };
+  const outline = (k = 'k') => {
+    const d = ctx.getImageData(0, 0, w, h).data, pts = [];
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        if (d[(y * w + x) * 4 + 3] === 0 && [[-1,0],[1,0],[0,-1],[0,1]].some(([dx, dy]) => {
+          const nx = x + dx, ny = y + dy;
+          return nx >= 0 && ny >= 0 && nx < w && ny < h && d[(ny * w + nx) * 4 + 3] > 0;
+        })) pts.push([x, y]);
+      }
+    }
+    pts.forEach(([x, y]) => px(x, y, k));
+  };
+  fn({ px, rect, ell, outline });
+  return c.toDataURL('image/png');
+}
+
+function buildKitchenWallpaper() {
+  return makeSprite(120, 180, ({ rect, ell, px }) => {
+    // 柔和白瓷磚牆面
+    rect(0, 0, 120, 96, 'w1');
+    for (let y = 12; y < 96; y += 12) rect(0, y, 120, 1, 'w2');
+    for (let y = 0; y < 96; y += 12) {
+      const offset = (y / 12) % 2 === 0 ? 0 : 12;
+      for (let x = offset; x < 120; x += 24) rect(x, y, 1, 12, 'w2');
+    }
+    // 上層木架與調味罐
+    rect(6, 22, 46, 4, 'br2'); rect(8, 26, 42, 2, 'br3');
+    rect(12, 11, 8, 11, 'o1'); rect(13, 9, 6, 2, 'r2');
+    rect(24, 13, 7, 9, 'g1'); rect(25, 11, 5, 2, 'y2');
+    rect(36, 10, 9, 12, 'b1'); rect(37, 8, 7, 2, 'w');
+    // 右側掛桿與鍋鏟湯勺
+    rect(72, 16, 40, 2, 's3');
+    rect(80, 18, 2, 14, 'br2'); ell(81, 34, 4, 3, 's2');
+    rect(96, 18, 2, 13, 'br2'); rect(94, 31, 6, 6, 's2');
+    // 灶台木檯面（參考插畫風格：木勺筒、圓麵包、番茄、香草盆栽、電鍋）
+    rect(0, 92, 120, 14, 'br1');
+    rect(0, 92, 120, 2, 'y1');
+    rect(0, 106, 120, 5, 'br3');
+    // 木勺筒
+    rect(6, 76, 10, 16, 'b2'); rect(8, 67, 2, 9, 'br1'); rect(12, 69, 2, 7, 'br2');
+    // 金黃圓麵包
+    ell(28, 85, 10, 7, 'o1'); ell(27, 83, 7, 4, 'y1');
+    // 紅番茄與青菜
+    ell(45, 88, 5, 4, 'r2'); px(45, 84, 'g2');
+    ell(54, 89, 4, 3, 'r3'); px(54, 86, 'g2');
+    ell(68, 84, 8, 6, 'g2'); ell(66, 82, 5, 4, 'g1');
+    // 香草小盆栽
+    rect(80, 82, 10, 10, 'o2'); ell(85, 78, 7, 5, 'g2'); ell(84, 76, 4, 3, 'g1');
+    // 可愛藍色電鍋
+    rect(95, 72, 19, 20, 'b2'); rect(97, 74, 15, 4, 'b1'); rect(94, 70, 21, 3, 's1');
+    // 下方廚櫃門板
+    rect(0, 111, 120, 69, 'w1');
+    rect(6, 117, 50, 56, 'w'); rect(8, 119, 46, 52, 'w1'); rect(26, 124, 10, 2, 's2');
+    rect(64, 117, 50, 56, 'w'); rect(66, 119, 46, 52, 'w1'); rect(84, 124, 10, 2, 's2');
+  });
+}
+
+function buildAllSprites() {
+  SPRITES.kitchenBg = buildKitchenWallpaper();
+
+  // 可愛廚師帽
+  SPRITES.chefHat = makeSprite(32, 32, ({ rect, ell, outline }) => {
+    ell(10, 12, 6, 6, 'w1'); ell(16, 9, 7, 6, 'w'); ell(22, 12, 6, 6, 'w1');
+    rect(8, 12, 16, 10, 'w'); rect(9, 18, 14, 7, 'w1'); rect(9, 22, 14, 3, 'r2');
+    rect(11, 14, 1, 6, 'w2'); rect(16, 13, 1, 7, 'w2'); rect(20, 14, 1, 6, 'w2');
+    outline('k');
+  });
+
+  // 超可愛圓潤搪瓷雙耳燉鍋（帶奶油白滾邊、腮紅與金色圓鈕）
+  SPRITES.potLid = makeSprite(52, 16, ({ rect, ell, outline }) => {
+    ell(26, 4, 5, 3, 'y2'); rect(24, 2, 3, 2, 'y1'); rect(23, 6, 6, 2, 'y3');
+    ell(26, 11, 21, 4.5, 'r2'); rect(6, 11, 40, 3, 'r2'); rect(10, 8, 18, 1.5, 'r1');
+    rect(4, 13, 44, 2, 'w1'); rect(7, 13, 20, 1, 'w');
+    outline('k');
+  });
+
+  SPRITES.potBody = makeSprite(52, 34, ({ rect, ell, px, outline }) => {
+    // 可愛圓耳把手
+    ell(4, 10, 3.5, 4, 'w1'); px(4, 10, 's2');
+    ell(48, 10, 3.5, 4, 'w1'); px(48, 10, 's2');
+    // 圓潤鍋身
+    ell(26, 18, 20, 13, 'r2');
+    rect(7, 5, 38, 18, 'r2');
+    rect(9, 24, 34, 4, 'r3');
+    rect(12, 28, 28, 3, 'r4');
+    // 奶油白鍋緣與可愛小腮紅
+    rect(6, 3, 40, 4, 'w1'); rect(8, 3, 22, 1, 'w'); rect(6, 6, 40, 1, 's2');
+    rect(9, 7, 4, 16, 'r1'); rect(10, 8, 1, 13, 'w');
+    rect(12, 15, 3, 2, 'pk'); rect(37, 15, 3, 2, 'pk');
+    outline('k');
+  });
+
+  // 20 種不重複食材精靈圖
+  SPRITES.beef = makeSprite(32, 32, ({ ell, rect, outline }) => {
+    ell(16, 17, 11, 8, 'r3'); ell(16, 15, 11, 7, 'r2'); ell(14, 14, 7, 4, 'r1');
+    rect(9, 13, 5, 1, 'w'); rect(12, 14, 4, 1, 'w1'); rect(18, 11, 4, 1, 'w');
+    rect(11, 17, 6, 1, 'w1'); rect(16, 16, 5, 1, 'w');
+    outline('k');
+  });
+  SPRITES.chicken = makeSprite(32, 32, ({ ell, rect, outline }) => {
+    ell(14, 16, 9, 7, 'o2'); ell(13, 15, 8, 6, 'o1'); rect(10, 12, 5, 2, 'y1');
+    rect(21, 15, 6, 3, 'w1'); ell(27, 14, 2.5, 2.5, 'w'); ell(27, 18, 2.5, 2.5, 'w');
+    outline('k');
+  });
+  SPRITES.pork = makeSprite(32, 32, ({ rect, px, outline }) => {
+    rect(6, 11, 20, 12, 'r1'); rect(6, 11, 20, 3, 'w1'); rect(6, 15, 20, 2, 'w');
+    rect(6, 19, 20, 4, 'r2'); px(10, 12, 'w'); px(20, 12, 'w');
+    outline('k');
+  });
+  SPRITES.bacon = makeSprite(32, 32, ({ rect, px, outline }) => {
+    rect(5, 11, 22, 11, 'r2'); rect(5, 13, 22, 2, 'w1'); rect(5, 17, 22, 2, 'pk');
+    rect(5, 20, 22, 2, 'r3'); px(9, 11, 'r1'); px(18, 11, 'r1');
+    outline('k');
+  });
+  SPRITES.egg = makeSprite(32, 32, ({ ell, rect, outline }) => {
+    ell(20, 14, 6, 8, 'w2'); ell(19, 13, 5, 7, 'w1'); rect(17, 9, 2, 3, 'w');
+    ell(13, 17, 7, 9, 'w1'); ell(12, 16, 6, 8, 'w'); rect(10, 11, 2, 4, 'w');
+    outline('k');
+  });
+  SPRITES.tomato = makeSprite(32, 32, ({ ell, rect, px, outline }) => {
+    ell(16, 17, 10, 9, 'r3'); ell(15, 16, 9, 8, 'r2'); ell(12, 14, 4, 3, 'r1'); rect(10, 12, 2, 2, 'w');
+    rect(15, 6, 2, 4, 'g3'); rect(11, 9, 10, 2, 'g2'); px(10, 10, 'g3'); px(21, 10, 'g3');
+    outline('k');
+  });
+  SPRITES.noodle = makeSprite(32, 32, ({ rect, px, outline }) => {
+    for (let r = 0; r < 5; r++) {
+      const y = 8 + r * 3;
+      rect(7, y, 18, 2, r % 2 === 0 ? 'y2' : 'y3');
+      for (let x = 8; x < 24; x += 4) { px(x, y, 'y1'); px(x + 2, y + 1, 'y4'); }
+    }
+    rect(13, 4, 2, 8, 'y1'); rect(17, 5, 2, 7, 'y2'); rect(6, 7, 20, 1, 'br2');
+    outline('k');
+  });
+  SPRITES.salmon = makeSprite(32, 32, ({ ell, rect, px, outline }) => {
+    ell(16, 16, 11, 7, 'o3'); ell(16, 15, 10, 6, 'o2');
+    for (let i = 0; i < 4; i++) {
+      const sx = 9 + i * 4;
+      rect(sx, 11, 1, 3, 'w'); rect(sx + 1, 14, 1, 3, 'w1'); rect(sx + 2, 17, 1, 2, 'w');
+    }
+    rect(7, 19, 18, 2, 's2'); px(10, 12, 'o1');
+    outline('k');
+  });
+  SPRITES.shrimp = makeSprite(32, 32, ({ ell, rect, px, outline }) => {
+    ell(17, 13, 7, 6, 'o2'); ell(14, 19, 6, 5, 'o2'); ell(16, 16, 4, 3, 'w');
+    rect(13, 9, 6, 2, 'o1'); rect(19, 11, 3, 2, 'w'); rect(18, 15, 3, 2, 'o3');
+    rect(8, 21, 5, 3, 'r2'); px(7, 20, 'r1'); px(7, 24, 'r3');
+    outline('k');
+  });
+  SPRITES.crab = makeSprite(32, 32, ({ ell, rect, px, outline }) => {
+    ell(16, 17, 9, 6, 'r2'); ell(16, 15, 7, 4, 'r1');
+    ell(8, 11, 3.5, 3.5, 'r2'); ell(24, 11, 3.5, 3.5, 'r2');
+    rect(6, 18, 3, 4, 'r3'); rect(23, 18, 3, 4, 'r3');
+    px(13, 13, 'w'); px(19, 13, 'w');
+    outline('k');
+  });
+  SPRITES.octopus = makeSprite(32, 32, ({ ell, rect, px, outline }) => {
+    ell(16, 13, 8, 7, 'r2'); ell(14, 11, 4, 3, 'r1');
+    rect(9, 19, 3, 6, 'r2'); rect(14, 20, 4, 6, 'r3'); rect(20, 19, 3, 6, 'r2');
+    px(13, 15, 'w'); px(18, 15, 'w');
+    outline('k');
+  });
+  SPRITES.cheese = makeSprite(32, 32, ({ rect, px, outline }) => {
+    for (let i = 0; i < 12; i++) rect(6 + i, 13 - Math.floor(i * .4), 19 - i, 1, 'y1');
+    rect(6, 13, 19, 10, 'y2'); rect(6, 21, 19, 2, 'y3'); rect(23, 10, 2, 13, 'y3');
+    rect(10, 15, 3, 3, 'o2'); px(10, 15, 'o3'); rect(17, 17, 3, 2, 'o2');
+    outline('k');
+  });
+  SPRITES.veggie = makeSprite(32, 32, ({ ell, rect, px, outline }) => {
+    ell(16, 13, 9, 7, 'g2'); ell(12, 14, 5, 5, 'g1'); ell(20, 14, 5, 5, 'g3');
+    rect(15, 9, 2, 10, 'g1'); px(13, 11, 'g1');
+    rect(12, 19, 8, 6, 'w1'); rect(14, 20, 4, 5, 'w'); rect(12, 24, 8, 2, 'g1');
+    outline('k');
+  });
+  SPRITES.rice = makeSprite(32, 32, ({ ell, rect, px, outline }) => {
+    ell(16, 13, 9, 6, 'w1'); ell(15, 12, 8, 5, 'w'); px(12, 10, 'w2'); px(16, 9, 'w2');
+    rect(7, 15, 18, 5, 'b2'); rect(9, 20, 14, 3, 'b3'); rect(11, 23, 10, 2, 'w2');
+    outline('k');
+  });
+  SPRITES.potato = makeSprite(32, 32, ({ ell, rect, px, outline }) => {
+    ell(16, 16, 10, 7, 'br2'); ell(15, 15, 9, 6, 'br1'); rect(11, 11, 6, 2, 'y1');
+    px(11, 15, 'br3'); px(18, 13, 'br3'); px(20, 18, 'br3');
+    outline('k');
+  });
+  SPRITES.pumpkin = makeSprite(32, 32, ({ ell, rect, outline }) => {
+    ell(16, 17, 10, 8, 'o2'); ell(11, 17, 5, 7, 'o1'); ell(21, 17, 5, 7, 'o3');
+    rect(15, 7, 3, 4, 'g3');
+    outline('k');
+  });
+  SPRITES.mushroom = makeSprite(32, 32, ({ ell, rect, outline }) => {
+    rect(13, 17, 6, 8, 'w1'); rect(14, 17, 2, 8, 'w'); rect(17, 17, 2, 8, 'w2');
+    ell(16, 13, 10, 6, 'br3'); ell(16, 12, 9, 5, 'br2'); rect(15, 9, 2, 6, 'w1'); rect(13, 11, 6, 2, 'w1');
+    outline('k');
+  });
+  SPRITES.tofu = makeSprite(32, 32, ({ rect, px, outline }) => {
+    rect(7, 12, 18, 4, 'w'); rect(7, 16, 18, 8, 'w1'); rect(21, 16, 4, 8, 'w2');
+    rect(13, 11, 2, 2, 'g2'); rect(16, 12, 3, 2, 'g1'); px(18, 11, 'g2');
+    outline('k');
+  });
+  SPRITES.corn = makeSprite(32, 32, ({ ell, rect, px, outline }) => {
+    ell(16, 15, 6, 9, 'y2'); ell(15, 14, 4, 7, 'y1');
+    px(14, 11, 'o1'); px(17, 13, 'o1'); px(14, 16, 'o1'); px(17, 18, 'o1');
+    ell(11, 20, 4, 6, 'g2'); ell(21, 20, 4, 6, 'g3'); rect(13, 22, 6, 4, 'g1');
+    outline('k');
+  });
+  SPRITES.onion = makeSprite(32, 32, ({ ell, rect, outline }) => {
+    ell(16, 18, 9, 8, 'o1'); ell(16, 18, 6, 7, 'y1'); rect(15, 7, 2, 5, 'g2');
+    rect(13, 10, 6, 2, 'o2');
+    outline('k');
+  });
+
+  // 盛盤料理像素圖（含單一食材料理與死神料理）
+  SPRITES.dish_curry = makeSprite(40, 40, ({ ell, rect, px, outline }) => {
+    ell(20, 21, 16, 11, 'w2'); ell(20, 20, 15, 10, 'w'); ell(25, 20, 8, 7, 'br3'); ell(24, 19, 7, 6, 'br2');
+    rect(22, 17, 3, 2, 'y2'); rect(26, 20, 2, 2, 'o2');
+    ell(14, 19, 7, 6, 'w1'); ell(14, 18, 6, 5, 'w'); px(12, 16, 'w2'); rect(17, 23, 3, 2, 'r2');
+    outline('k');
+  });
+  SPRITES.dish_oyakodon = makeSprite(40, 40, ({ ell, rect, px, outline }) => {
+    ell(20, 24, 13, 8, 'r3'); rect(8, 18, 24, 7, 'r2'); rect(13, 30, 14, 3, 'r4');
+    ell(20, 17, 11, 5, 'y2'); ell(19, 16, 9, 4, 'y1'); rect(14, 15, 4, 3, 'br1'); rect(21, 16, 4, 3, 'br2');
+    rect(18, 14, 4, 2, 'g2'); px(19, 14, 'g1');
+    outline('k');
+  });
+  SPRITES.dish_tempura = makeSprite(40, 40, ({ ell, rect, px, outline }) => {
+    ell(20, 25, 13, 7, 'b3'); rect(8, 19, 24, 7, 'b2'); rect(9, 20, 22, 1, 'w'); rect(13, 30, 14, 3, 'b3');
+    ell(20, 18, 10, 4, 'w'); rect(11, 11, 5, 8, 'y2'); rect(11, 9, 3, 2, 'r2');
+    rect(20, 10, 5, 9, 'y2'); rect(22, 8, 3, 2, 'r2'); rect(25, 15, 4, 4, 'g2'); px(15, 17, 'br3');
+    outline('k');
+  });
+  SPRITES.dish_salmon_set = makeSprite(40, 40, ({ rect, ell, px, outline }) => {
+    rect(4, 9, 32, 22, 'br2'); rect(5, 10, 30, 20, 'br1');
+    rect(7, 12, 14, 7, 'o2'); rect(9, 12, 1, 7, 'br3'); rect(13, 12, 1, 7, 'br3'); rect(17, 12, 1, 7, 'br3');
+    px(8, 13, 'o1'); ell(12, 24, 5, 4, 'b2'); ell(12, 22, 4, 2, 'w');
+    ell(27, 24, 5, 4, 'r3'); ell(27, 23, 4, 2, 'y3'); rect(24, 12, 8, 5, 'y2');
+    outline('k');
+  });
+  SPRITES.dish_hotpot = makeSprite(40, 40, ({ ell, rect, px, outline }) => {
+    rect(4, 17, 3, 3, 's3'); rect(33, 17, 3, 3, 's3'); ell(20, 24, 14, 8, 'br4'); rect(7, 17, 26, 8, 's3');
+    ell(20, 17, 12, 5, 'o1'); rect(11, 15, 5, 4, 'w'); ell(21, 15, 4, 3, 'br2'); px(21, 14, 'w');
+    rect(15, 18, 6, 3, 'g2'); rect(25, 17, 4, 3, 'r2');
+    outline('k');
+  });
+  SPRITES.dish_ramen = makeSprite(40, 40, ({ ell, rect, px, outline }) => {
+    ell(20, 25, 13, 7, 'r4'); rect(7, 18, 26, 8, 'r3'); rect(8, 19, 24, 1, 'y2'); ell(20, 18, 11, 5, 'y1');
+    rect(11, 17, 12, 2, 'y2'); ell(24, 16, 4, 3, 'br2'); ell(14, 15, 3, 2.5, 'w'); px(14, 15, 'y2');
+    rect(18, 12, 4, 4, 'g4'); rect(20, 19, 4, 2, 'g2');
+    outline('k');
+  });
+  SPRITES.dish_bibimbap = makeSprite(40, 40, ({ ell, rect, px, outline }) => {
+    ell(20, 25, 13, 7, 's3'); rect(8, 19, 24, 7, 's3'); rect(12, 30, 16, 3, 'br3'); ell(20, 18, 10, 4, 'w');
+    rect(11, 16, 5, 3, 'r2'); rect(24, 16, 5, 3, 'g2'); rect(13, 19, 5, 2, 'br2'); ell(20, 17, 4, 3, 'w');
+    px(20, 17, 'y2'); rect(17, 13, 6, 2, 'y1');
+    outline('k');
+  });
+  SPRITES.dish_sundubu = makeSprite(40, 40, ({ ell, rect, px, outline }) => {
+    ell(20, 25, 13, 7, 's3'); rect(8, 19, 24, 7, 's3'); ell(20, 18, 10, 4, 'r2');
+    rect(12, 16, 5, 4, 'w'); rect(22, 16, 5, 4, 'w1'); ell(19, 17, 3, 2, 'y2'); rect(16, 14, 4, 2, 'g2');
+    px(15, 19, 'r1');
+    outline('k');
+  });
+  SPRITES.dish_kchicken = makeSprite(40, 40, ({ ell, rect, px, outline }) => {
+    ell(20, 21, 16, 11, 'w2'); ell(20, 20, 15, 10, 'w'); ell(15, 19, 5, 4, 'r2'); ell(23, 18, 5, 4, 'r3');
+    ell(19, 22, 5, 3, 'r2'); rect(13, 17, 3, 2, 'o2'); rect(22, 16, 3, 2, 'o2'); px(15, 18, 'y1');
+    rect(25, 22, 4, 2, 'w1'); rect(11, 22, 4, 2, 'w1');
+    outline('k');
+  });
+  SPRITES.dish_luroufan = makeSprite(40, 40, ({ ell, rect, px, outline }) => {
+    ell(20, 24, 13, 8, 'b2'); rect(8, 18, 24, 7, 'b1'); rect(13, 30, 14, 3, 'b3'); ell(20, 18, 10, 4, 'w');
+    ell(18, 17, 7, 4, 'br3'); rect(14, 16, 6, 3, 'br2'); ell(25, 16, 3, 2.5, 'br2');
+    rect(11, 18, 4, 3, 'y2'); rect(22, 19, 4, 2, 'g2'); px(16, 16, 'br1');
+    outline('k');
+  });
+  SPRITES.dish_beefnoodle = makeSprite(40, 40, ({ ell, rect, px, outline }) => {
+    ell(20, 25, 13, 7, 'w2'); rect(7, 18, 26, 8, 'w'); rect(8, 20, 24, 2, 'b2'); ell(20, 18, 11, 5, 'br3');
+    rect(11, 18, 10, 2, 'y1'); rect(12, 15, 6, 3, 'br2'); rect(20, 14, 6, 3, 'br2'); rect(23, 18, 5, 3, 'g2');
+    rect(15, 13, 3, 2, 'r2'); px(14, 15, 'br1');
+    outline('k');
+  });
+  SPRITES.dish_shacha_noodle = makeSprite(40, 40, ({ ell, rect, px, outline }) => {
+    rect(4, 14, 32, 15, 's3'); rect(6, 15, 28, 12, 's2'); ell(20, 20, 11, 5, 'br2'); ell(19, 19, 9, 4, 'y3');
+    rect(13, 17, 5, 3, 'r3'); rect(21, 18, 5, 3, 'r3'); rect(16, 15, 6, 3, 'g2'); px(18, 16, 'g1');
+    outline('k');
+  });
+  SPRITES.dish_sanbei = makeSprite(40, 40, ({ ell, rect, px, outline }) => {
+    rect(4, 18, 3, 3, 's3'); rect(33, 18, 3, 3, 's3'); ell(20, 24, 14, 8, 'br4'); rect(7, 17, 26, 8, 'br3');
+    ell(20, 17, 11, 4, 'br2'); ell(15, 16, 4, 3, 'o2'); ell(23, 16, 4, 3, 'br1'); rect(18, 13, 5, 3, 'g3');
+    rect(12, 18, 4, 2, 'g2'); rect(25, 18, 3, 2, 'r2'); px(15, 15, 'o1');
+    outline('k');
+  });
+  SPRITES.dish_burger_steak = makeSprite(40, 40, ({ ell, rect, px, outline }) => {
+    ell(20, 21, 16, 11, 'w2'); ell(20, 20, 15, 10, 'w'); ell(16, 20, 7, 5, 'br3'); ell(16, 18, 7, 4, 'br2');
+    rect(12, 16, 8, 3, 'y2'); rect(24, 16, 5, 2, 'y2'); rect(25, 19, 5, 2, 'y3');
+    rect(23, 21, 5, 2, 'y2'); rect(23, 14, 4, 2, 'g2'); px(16, 15, 'r2');
+    outline('k');
+  });
+  SPRITES.dish_fish_chips = makeSprite(40, 40, ({ ell, rect, outline }) => {
+    ell(20, 21, 16, 11, 'w2'); ell(20, 20, 15, 10, 'w'); rect(10, 16, 9, 4, 'o2'); rect(11, 17, 6, 2, 'y2');
+    rect(12, 21, 9, 4, 'o2'); rect(13, 22, 6, 2, 'y2'); rect(23, 15, 5, 2, 'y1'); rect(24, 18, 5, 2, 'y2');
+    rect(23, 21, 5, 2, 'y1'); ell(26, 24, 3, 2, 'w1');
+    outline('k');
+  });
+  SPRITES.dish_omelet_brunch = makeSprite(40, 40, ({ ell, rect, px, outline }) => {
+    ell(20, 21, 16, 11, 'w2'); ell(20, 20, 15, 10, 'w'); ell(16, 19, 8, 5, 'y2'); ell(15, 18, 7, 4, 'y1');
+    rect(13, 18, 5, 2, 'o2'); rect(24, 15, 5, 3, 'r2'); rect(23, 20, 6, 4, 'g2'); px(25, 21, 'r2');
+    outline('k');
+  });
+  SPRITES.dish_pasta = makeSprite(40, 40, ({ ell, rect, px, outline }) => {
+    ell(20, 21, 16, 11, 'w2'); ell(20, 20, 15, 10, 'w'); ell(20, 19, 10, 6, 'y2'); ell(20, 18, 8, 5, 'y1');
+    ell(20, 17, 6, 3, 'r2'); rect(17, 16, 3, 2, 'r1'); rect(19, 14, 3, 2, 'g2'); px(15, 19, 'y3');
+    outline('k');
+  });
+  SPRITES.dish_gratin = makeSprite(40, 40, ({ ell, rect, px, outline }) => {
+    rect(3, 19, 3, 3, 'w2'); rect(34, 19, 3, 3, 'w2'); ell(20, 21, 15, 9, 'w1'); ell(20, 20, 12, 6, 'y2');
+    ell(19, 19, 10, 5, 'y1'); rect(13, 18, 3, 2, 'o3'); rect(23, 20, 3, 2, 'o3'); px(19, 18, 'g2');
+    outline('k');
+  });
+  SPRITES.dish_tamagoyaki = makeSprite(40, 40, ({ ell, rect, px, outline }) => {
+    ell(20, 21, 16, 11, 'w2'); ell(20, 20, 15, 10, 'w');
+    rect(11, 16, 18, 8, 'y2'); rect(12, 15, 16, 3, 'y1'); rect(15, 16, 1, 8, 'o2'); rect(21, 16, 1, 8, 'o2');
+    rect(26, 22, 4, 3, 'g2'); px(14, 17, 'w');
+    outline('k');
+  });
+  SPRITES.dish_steak = makeSprite(40, 40, ({ ell, rect, px, outline }) => {
+    ell(20, 21, 16, 11, 'w2'); ell(20, 20, 15, 10, 'w');
+    ell(18, 19, 9, 5, 'br3'); ell(17, 18, 8, 4, 'br2');
+    rect(13, 17, 7, 1, 'br4'); rect(14, 19, 7, 1, 'br4');
+    rect(24, 15, 4, 3, 'g2'); rect(25, 21, 4, 2, 'y2'); px(15, 16, 'o1');
+    outline('k');
+  });
+  SPRITES.onigiri = makeSprite(40, 40, ({ ell, rect, outline }) => {
+    ell(20, 21, 16, 11, 'w2'); ell(20, 20, 15, 10, 'w');
+    ell(16, 20, 6, 5, 'w1'); rect(14, 21, 4, 4, 'g4');
+    ell(24, 19, 6, 5, 'w1'); rect(22, 20, 4, 4, 'g4');
+    outline('k');
+  });
+  SPRITES.dish_onigiri = SPRITES.onigiri;
+  SPRITES.dish_corn_butter = makeSprite(40, 40, ({ ell, rect, px, outline }) => {
+    ell(20, 21, 16, 11, 'w2'); ell(20, 20, 15, 10, 'w');
+    rect(12, 16, 16, 7, 'y2'); rect(13, 15, 14, 3, 'y1');
+    rect(18, 14, 4, 3, 'w1'); px(15, 18, 'o2'); px(23, 19, 'o2');
+    outline('k');
+  });
+  // 焦黑死神料理（完全炭化黑灰色調與濃煙）
+  SPRITES.dish_burnt = makeSprite(40, 40, ({ ell, rect, px, outline }) => {
+    ell(20, 23, 15, 9, 's3'); ell(20, 22, 14, 8, 's2');
+    ell(20, 20, 11, 6, 'br4'); ell(19, 19, 9, 5, 'k');
+    rect(14, 17, 11, 4, 'k'); rect(16, 15, 7, 3, 's3');
+    ell(14, 12, 3, 3, 's3'); px(13, 11, 's2');
+    ell(25, 10, 3.5, 3.5, 's3'); px(24, 9, 's2');
+    rect(19, 6, 3, 4, 's2'); px(17, 19, 'r3'); px(22, 18, 'o3');
+    outline('k');
+  });
+}
+
+const imgTag = (key, alt = '') => `<img class="px-art" src="${SPRITES[key] || SPRITES.dish_curry}" alt="${alt}">`;
+
+/* ===== 2. 20種豐富食材與預設 24 道精準食譜資料庫 ===== */
+const INGREDIENTS = [
+  { id: 'beef', name: '牛肉', sprite: 'beef' },
+  { id: 'chicken', name: '雞肉', sprite: 'chicken' },
+  { id: 'pork', name: '豬肉', sprite: 'pork' },
+  { id: 'bacon', name: '培根', sprite: 'bacon' },
+  { id: 'egg', name: '雞蛋', sprite: 'egg' },
+  { id: 'tomato', name: '番茄', sprite: 'tomato' },
+  { id: 'noodle', name: '麵條', sprite: 'noodle' },
+  { id: 'salmon', name: '鮭魚', sprite: 'salmon' },
+  { id: 'shrimp', name: '鮮蝦', sprite: 'shrimp' },
+  { id: 'crab', name: '螃蟹', sprite: 'crab' },
+  { id: 'octopus', name: '章魚', sprite: 'octopus' },
+  { id: 'cheese', name: '起司', sprite: 'cheese' },
+  { id: 'veggie', name: '青菜', sprite: 'veggie' },
+  { id: 'rice', name: '米飯', sprite: 'rice' },
+  { id: 'potato', name: '馬鈴薯', sprite: 'potato' },
+  { id: 'pumpkin', name: '南瓜', sprite: 'pumpkin' },
+  { id: 'mushroom', name: '香菇', sprite: 'mushroom' },
+  { id: 'tofu', name: '豆腐', sprite: 'tofu' },
+  { id: 'corn', name: '玉米', sprite: 'corn' },
+  { id: 'onion', name: '洋蔥', sprite: 'onion' }
+];
+
+const DEFAULT_RECIPES = [
+  // 日式料理
+  { cuisine: '日式料理', kcal: 820, required: ['beef', 'potato'], bonus: ['onion', 'rice'], title: '濃厚和風牛肉咖哩飯', sprite: 'dish_curry', query: '日式咖哩飯', desc: '慢火燉煮綿密馬鈴薯與霜降牛肉塊，濃郁辛香料咖哩醬淋在熱白飯上，滿分療癒！' },
+  { cuisine: '日式料理', kcal: 680, required: ['chicken', 'egg'], bonus: ['rice', 'onion'], title: '滑蛋和風親子丼', sprite: 'dish_oyakodon', query: '親子丼 日式丼飯', desc: '朱紅漆碗盛裝半熟滑嫩蛋液與鮮嫩雞腿肉，甘甜柴魚醬汁滲入米飯超暖心。' },
+  { cuisine: '日式料理', kcal: 850, required: ['shrimp', 'rice'], bonus: ['egg', 'veggie'], title: '豪華海老天婦羅丼', sprite: 'dish_tempura', query: '天婦羅丼飯 天丼', desc: '現炸金黃酥脆雙蝦天婦羅鋪滿熱白飯，淋上秘製甘甜天丼醬汁讓人一口接一口。' },
+  { cuisine: '日式料理', kcal: 620, required: ['salmon'], bonus: ['rice', 'veggie', 'egg'], title: '炭火炙燒鮭魚定食', sprite: 'dish_salmon_set', query: '烤鮭魚定食 日式定食', desc: '木托盤擺滿油脂豐厚的炙燒鮭魚排與精緻配菜，鮮美多汁、營養滿點的晚餐！' },
+  { cuisine: '日式料理', kcal: 420, required: ['tofu', 'veggie'], bonus: ['mushroom', 'salmon', 'corn'], title: '暖心昆布蔬菜豆腐土鍋', sprite: 'dish_hotpot', query: '日式小火鍋 涮涮鍋', desc: '清甜昆布高湯燉煮嫩白豆腐與翠綠時蔬，低卡無負擔的暖胃首選！' },
+  { cuisine: '日式料理', kcal: 890, required: ['noodle', 'egg'], bonus: ['pork', 'veggie', 'corn'], title: '濃厚豚骨叉燒拉麵', sprite: 'dish_ramen', query: '日式豚骨拉麵', desc: '乳白濃醇豚骨湯頭搭配Q彈細麵與溏心蛋，深夜最幸福的拉麵享受。' },
+  { cuisine: '日式料理', kcal: 760, required: ['octopus', 'egg'], bonus: ['onion', 'veggie'], title: '大阪風鐵板章魚燒拼盤', sprite: 'dish_oyakodon', query: '章魚燒 日式小吃', desc: '外酥內軟的麵糊包裹彈牙大塊章魚腳，刷上鹹甜醬汁與柴魚片香氣撲鼻！' },
+  { cuisine: '日式料理', kcal: 360, required: ['egg'], bonus: ['corn', 'cheese'], title: '京都高湯厚燒玉子燒', sprite: 'dish_tamagoyaki', query: '玉子燒 日式料理', desc: '層層細心捲起的金黃厚蛋燒，鎖住滿滿昆布柴魚高湯，軟嫩多汁超療癒！' },
+  { cuisine: '日式料理', kcal: 390, required: ['rice'], bonus: ['salmon', 'egg'], title: '和風手捏海苔御飯糰', sprite: 'dish_onigiri', query: '日式飯糰', desc: '粒粒分明的越光米飯捏成飽滿三角飯糰，包上香脆海苔簡單又美味！' },
+  // 韓式料理
+  { cuisine: '韓式料理', kcal: 760, required: ['rice', 'egg'], bonus: ['cheese', 'beef', 'veggie'], title: '韓式起司石鍋拌飯', sprite: 'dish_bibimbap', query: '韓式石鍋拌飯', desc: '滾燙石鍋底部結出香脆鍋巴，拌入牽絲起司與太陽蛋，香氣十足超開胃！' },
+  { cuisine: '韓式料理', kcal: 590, required: ['tofu', 'beef'], bonus: ['egg', 'mushroom', 'onion'], title: '韓式辣牛肉嫩豆腐鍋', sprite: 'dish_sundubu', query: '韓式豆腐鍋', desc: '紅亮香辣牛骨湯頭搭配入口即化的嫩豆腐與牛肉片，暖呼呼超級下飯。' },
+  { cuisine: '韓式料理', kcal: 940, required: ['chicken', 'cheese'], bonus: ['tomato', 'corn'], title: '韓式洋釀起司炸雞拼盤', sprite: 'dish_kchicken', query: '韓式炸雞', desc: '外酥內嫩多汁炸雞裹滿甜辣洋釀醬汁，搭配濃郁起司沾醬，聚餐必點！' },
+  { cuisine: '韓式料理', kcal: 780, required: ['crab', 'tofu'], bonus: ['shrimp', 'veggie'], title: '釜山鮮蟹海鮮辣湯鍋', sprite: 'dish_sundubu', query: '韓式海鮮鍋', desc: '整隻鮮甜螃蟹與嫩豆腐一同熬煮，海味精華融入微辣高湯中鮮美無比！' },
+  // 台式料理
+  { cuisine: '台式料理', kcal: 740, required: ['pork', 'rice'], bonus: ['mushroom', 'egg', 'tofu'], title: '古早味香菇滷肉飯套餐', sprite: 'dish_luroufan', query: '滷肉飯 台灣小吃', desc: '手切帶皮五花肉與埔里香菇慢滷出滿滿膠質，配上滷蛋就是最道地的台灣味！' },
+  { cuisine: '台式料理', kcal: 780, required: ['beef', 'noodle'], bonus: ['tomato', 'veggie'], title: '台式紅燒番茄牛肉麵', sprite: 'dish_beefnoodle', query: '番茄牛肉麵', desc: '新鮮牛番茄與牛大骨熬出酸甜紅燒湯頭，搭配厚實軟嫩牛肉與手工寬麵。' },
+  { cuisine: '台式料理', kcal: 810, required: ['beef', 'veggie'], bonus: ['noodle', 'onion'], title: '夜市鐵板沙茶牛肉炒麵', sprite: 'dish_shacha_noodle', query: '沙茶牛肉炒麵 熱炒', desc: '大火快炒鎖住濃郁沙茶醬香與滑嫩牛肉片，加上脆口時蔬鑊氣十足！' },
+  { cuisine: '台式料理', kcal: 540, required: ['shrimp', 'mushroom'], bonus: ['chicken', 'tofu'], title: '塔香三杯菇菇鮮蝦煲', sprite: 'dish_sanbei', query: '三杯料理 台式熱炒', desc: '麻油爆香老薑與蒜頭，將彈牙鮮蝦與厚實鮮菇收汁入味，九層塔香氣撲鼻！' },
+  { cuisine: '台式料理', kcal: 380, required: ['corn'], bonus: ['egg', 'bacon'], title: '夜市奶油香烤甜玉米', sprite: 'dish_corn_butter', query: '烤玉米 台灣夜市', desc: '飽滿多汁的黃金甜玉米刷上特製醬汁與奶油炙烤，焦香四溢超涮嘴！' },
+  // 美式料理
+  { cuisine: '美式料理', kcal: 980, required: ['beef', 'cheese'], bonus: ['bacon', 'tomato', 'onion'], title: '美式雙層起司牛肉漢堡排', sprite: 'dish_burger_steak', query: '美式漢堡排 美式餐廳', desc: '厚實多汁純牛肉漢堡排蓋上融化切達起司，大口吃肉超級滿足！' },
+  { cuisine: '美式料理', kcal: 910, required: ['shrimp', 'potato'], bonus: ['corn', 'cheese'], title: '黃金炸蝦薯條美式拼盤', sprite: 'dish_fish_chips', query: '炸魚薯條 美式餐廳', desc: '金黃酥脆炸蝦與現炸美式粗薯條，沾上特製塔塔醬爽脆度爆表！' },
+  { cuisine: '美式料理', kcal: 670, required: ['egg', 'bacon'], bonus: ['tomato', 'cheese', 'mushroom'], title: '美式培根起司歐姆蛋拼盤', sprite: 'dish_omelet_brunch', query: '美式早午餐 歐姆蛋', desc: '金黃蓬鬆蛋皮包裹香煎培根與濃郁起司，經典美式早午餐風味。' },
+  { cuisine: '美式料理', kcal: 790, required: ['beef'], bonus: ['potato', 'corn'], title: '炭烤厚切嫩肩牛排餐', sprite: 'dish_steak', query: '美式牛排館', desc: '高溫鎖住鮮甜肉汁的厚切牛排，表面烙印迷人焦香，每一口都超滿足！' },
+  // 義式料理
+  { cuisine: '義式料理', kcal: 720, required: ['tomato', 'noodle'], bonus: ['beef', 'pork', 'onion', 'cheese'], title: '經典番茄肉醬義大利麵', sprite: 'dish_pasta', query: '義大利麵 義式餐廳', desc: '彈牙直麵拌入慢火熬煮的酸甜番茄肉醬，撒上起司香氣迷人！' },
+  { cuisine: '義式料理', kcal: 860, required: ['cheese', 'rice'], bonus: ['shrimp', 'pumpkin', 'chicken', 'bacon'], title: '濃郁奶油起司黃金焗烤飯', sprite: 'dish_gratin', query: '焗烤飯 義式餐廳', desc: '白醬奶油燉飯鋪滿雙色乳酪絲烤至金黃微焦，挖開瞬間牽絲超誘人！' }
+];
+
+/* ===== 3. 遊戲狀態與核心控制 ===== */
+const $ = id => document.getElementById(id);
+const STORAGE_KEY = 'mineral_kitchen_recipes_v3';
+
+function loadRecipes() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch (e) {}
+  return JSON.parse(JSON.stringify(DEFAULT_RECIPES));
+}
+
+function saveRecipes(list) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); } catch (e) {}
+}
+
+let RECIPES = loadRecipes();
+
+const state = {
+  location: '台北市文山區',
+  reels: [0, 4, 7, 13],
+  reelsRolled: false, // 尚未拉動拉桿前顯示「？」神秘卡
+  panItems: [], // 儲存 { item, fromReel }，拉動轉盤時不會清空鍋內已選食材！
+  firing: false,
+  temp: 0,
+  burnt: false,
+  warned: false,
+  spinning: false,
+  timer: null,
+  bookCat: 'ALL',
+  pickedNewIngs: [],
+  hasServedDish: false
+};
+
+function setHint(text, tone = '') {
+  const el = $('hintBar');
+  el.textContent = text;
+  el.className = 'hint-bar' + (tone ? ' ' + tone : '');
+}
+
+/* 抽取 4 個彼此完全不重複、且盡量避開鍋中已有食材的索引 */
+function getUniqueFourReels(excludeIds = []) {
+  const allIndices = INGREDIENTS.map((_, i) => i);
+  const preferred = allIndices.filter(i => !excludeIds.includes(INGREDIENTS[i].id));
+  const pool = preferred.length >= 4 ? preferred : allIndices;
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(0, 4);
+}
+
+function initReels() {
+  const grid = $('reelsGrid');
+  grid.innerHTML = '';
+  const initialFour = getUniqueFourReels();
+  state.reels = initialFour;
+  state.reelsRolled = false;
+
+  for (let i = 0; i < 4; i++) {
+    const reel = document.createElement('div');
+    reel.className = 'reel';
+    const strip = document.createElement('div');
+    strip.className = 'strip';
+    strip.innerHTML =
+      `<div class="cell mystery-cell"><div class="q-mark">?</div><span>待轉出</span></div>` +
+      [...INGREDIENTS, ...INGREDIENTS]
+        .map(it => `<div class="cell">${imgTag(it.sprite, it.name)}<span>${it.name}</span></div>`)
+        .join('');
+    reel.appendChild(strip);
+    grid.appendChild(reel);
+    setMysteryStrip(i);
+
+    // 僅允許點擊上方 4 個食材格來加入或取消該食材
+    reel.addEventListener('click', () => {
+      SoundFX.autoUnlock();
+      toggleIngredientFromReel(i);
+    });
+  }
+}
+
+function setMysteryStrip(reelIdx) {
+  const strip = $('reelsGrid').children[reelIdx]?.querySelector('.strip');
+  if (!strip) return;
+  strip.classList.add('instant');
+  strip.style.transform = 'translateY(0px)';
+}
+
+function positionStrip(reelIdx, itemIdx, instant = false) {
+  const strip = $('reelsGrid').children[reelIdx]?.querySelector('.strip');
+  if (!strip) return;
+  strip.classList.toggle('instant', instant);
+  strip.style.transform = `translateY(-${(itemIdx + 1) * 82}px)`;
+}
+
+/* 拉動左側拉桿：保留鍋裡已選的食材，並為上方轉出 4 種全新的不重複食材 */
+function spinReels() {
+  SoundFX.autoUnlock();
+  if (state.spinning) return;
+  if (state.firing) return setHint('請先關火再拉動食材轉盤喔！', 'orange');
+  if (state.burnt) return setHint('鍋子燒焦啦！請先點擊「清空重來」清洗鍋具。', 'red');
+
+  state.spinning = true;
+  clearPreviousServedDish();
+  updateReelsUI();
+  $('leverBtn').classList.add('pulling');
+  const keptCount = state.panItems.length;
+  setHint(
+    keptCount > 0
+      ? `喀啦喀啦！保留鍋內 ${keptCount} 種食材，正在抽取其他新食材...`
+      : '喀啦喀啦！正在抽取 4 種不重複的新鮮食材...',
+    'orange'
+  );
+
+  const inPotIds = state.panItems.map(e => e.item.id);
+  const nextFour = getUniqueFourReels(inPotIds);
+
+  for (let i = 0; i < 4; i++) {
+    const target = nextFour[i];
+    state.reels[i] = target;
+    positionStrip(i, 0, true);
+    setTimeout(() => {
+      SoundFX.spinTick(i);
+      requestAnimationFrame(() => requestAnimationFrame(() => positionStrip(i, INGREDIENTS.length + target, false)));
+    }, i * 110);
+  }
+
+  setTimeout(() => {
+    $('leverBtn').classList.remove('pulling');
+    state.spinning = false;
+    state.reelsRolled = true;
+    for (let i = 0; i < 4; i++) positionStrip(i, state.reels[i], true);
+    updateReelsUI();
+    setHint(
+      keptCount > 0
+        ? `抽好啦！鍋內已有 ${keptCount} 種食材，可繼續點擊加入新食材或直接開火！`
+        : '抽好啦！點擊上方食材格放入燉鍋（再點一次可取消）！',
+      'green'
+    );
+  }, 1150);
+}
+
+function updatePotUI() {
+  const iconsEl = $('potIcons');
+  const serveBtn = $('serveBtn');
+
+  if (state.panItems.length === 0) {
+    iconsEl.innerHTML = '';
+  } else {
+    iconsEl.innerHTML = state.panItems.map(entry => imgTag(entry.item.sprite, entry.item.name)).join('');
+  }
+
+  // 只要鍋中有食材，隨時皆可點擊「起鍋盛盤」（未熟或燒焦會出紫色死神料理）
+  const hasItems = state.panItems.length > 0;
+  serveBtn.disabled = !hasItems;
+  const isPerfect = hasItems && state.temp >= 75 && state.temp < 100 && !state.burnt;
+  serveBtn.classList.toggle('ready', isPerfect);
+}
+
+function updateReelsUI() {
+  const reels = $('reelsGrid').children;
+  const inPotIds = new Set(state.panItems.map(e => e.item.id));
+  for (let i = 0; i < 4; i++) {
+    if (!reels[i]) continue;
+    if (!state.reelsRolled) {
+      reels[i].classList.remove('selected');
+      continue;
+    }
+    const currentItem = INGREDIENTS[state.reels[i]];
+    const isSelected = currentItem && inPotIds.has(currentItem.id);
+    reels[i].classList.toggle('selected', isSelected);
+  }
+}
+
+/* 點擊上方 4 格：已選中則取消放回，未選中則加入鍋內（拉過轉盤後也能取消） */
+function toggleIngredientFromReel(idx) {
+  if (state.spinning) return;
+  if (!state.reelsRolled) return setHint('請先拉動左側拉桿轉出食材喔！', 'orange');
+  if (state.burnt) return setHint('鍋子燒焦啦！請先點擊「清空重來」清洗鍋具。', 'red');
+
+  const item = INGREDIENTS[state.reels[idx]];
+  if (!item) return;
+
+  clearPreviousServedDish();
+
+  const existingPotIdx = state.panItems.findIndex(e => e.item.id === item.id);
+  if (existingPotIdx !== -1) {
+    state.panItems.splice(existingPotIdx, 1);
+    SoundFX.remove();
+    updateReelsUI();
+    updatePotUI();
+    setHint(`已從燉鍋取出「${item.name}」（目前鍋內 ${state.panItems.length}/4 種）。`, '');
+    return;
+  }
+
+  if (state.panItems.length >= 4) {
+    return setHint('燉鍋最多只能放 4 種食材喔！可點擊已選食材格取消其中一種。', 'orange');
+  }
+
+  state.panItems.push({ item, fromReel: idx });
+  SoundFX.drop();
+  updateReelsUI();
+  updatePotUI();
+  if (!state.firing) {
+    setHint(`已放入「${item.name}」（${state.panItems.length}/4）！可繼續拉轉盤找食材或開火。`, 'green');
+  }
+}
+
+function toggleFire() {
+  SoundFX.autoUnlock();
+  if (state.spinning) return;
+  if (!state.firing) {
+    if (state.panItems.length === 0) return setHint('空鍋不能乾燒喔！請先點擊上方食材放入燉鍋。', 'orange');
+    if (state.burnt) return setHint('這鍋已經燒焦了，請先「清空重來」再煮下一道！', 'red');
+    clearPreviousServedDish();
+    state.firing = true;
+    SoundFX.fireOn();
+    $('fireBtn').classList.add('on');
+    $('powerLed').classList.add('hot');
+    $('potUnit').classList.add('cooking', 'shake');
+    setHint('大火烹煮中！熟度達 75%～99% 才能做出美味料理，未熟或 100% 會變死神料理！', 'orange');
+    state.timer = setInterval(() => {
+      state.temp = Math.min(100, state.temp + 2.5);
+      updateThermoUI();
+    }, 200);
+  } else {
+    stopFire();
+    SoundFX.click();
+    setHint(`已關火保溫（目前熟度 ${Math.round(state.temp)}%）。`, '');
+  }
+}
+
+function stopFire() {
+  state.firing = false;
+  clearInterval(state.timer);
+  state.timer = null;
+  $('fireBtn').classList.remove('on');
+  $('powerLed').classList.remove('hot');
+  $('potUnit').classList.remove('cooking', 'shake', 'sizzle', 'warn');
+}
+
+function updateThermoUI() {
+  const t = Math.round(state.temp);
+  $('tempVal').textContent = `${t}°`;
+  $('thermoFill').style.height = `${t}%`;
+
+  const box = $('thermoBox');
+  const pot = $('potUnit');
+  box.classList.toggle('ready', t >= 75 && t < 90);
+  box.classList.toggle('hot', t >= 90);
+
+  if (t >= 75 && t < 90) {
+    pot.classList.add('sizzle');
+    setHint(`熟度 ${t}% 進入黃金綠色區間！現在點擊「起鍋盛盤」就能做出美味料理！`, 'green');
+  } else if (t >= 90 && t < 100) {
+    pot.classList.add('warn');
+    if (!state.warned) {
+      state.warned = true;
+      SoundFX.warn();
+    }
+    setHint(`危險！熟度 ${t}% 進入紅色警戒線，快點「起鍋盛盤」或關火！`, 'red');
+  } else if (t >= 100 && !state.burnt) {
+    state.burnt = true;
+    stopFire();
+    pot.classList.add('burnt');
+    SoundFX.death();
+    setHint('慘了！煮到 100% 變成「紫色死神料理」了……盛盤看看結果或清空重來！', 'red');
+  }
+  updatePotUI();
+}
+
+/* 嚴格依據實際放入的食材精準匹配真實菜系與道地料理名稱（絕不出現「第15組」或生硬拼湊名稱） */
+function matchDish() {
+  const t = Math.round(state.temp);
+  const panNames = state.panItems.map(e => e.item.name);
+
+  if (state.burnt || t >= 100) {
+    return {
+      isDeathDish: true,
+      cuisine: '暗黑死神料理',
+      kcal: '???',
+      title: '焦黑謎樣死神物質',
+      sprite: 'dish_burnt',
+      query: '附近餐廳 救命晚餐',
+      desc: `因為烹煮時間過長（熟度 100%），鍋裡的【${panNames.join('、')}】已經融合成散發紫色毒霧的焦黑物質……今晚還是出門找間好餐廳比較安全！`
+    };
+  }
+
+  if (t < 75) {
+    return {
+      isDeathDish: true,
+      cuisine: '暗黑死神料理',
+      kcal: '???',
+      title: '半生不熟紫色死神鍋',
+      sprite: 'dish_burnt',
+      query: '附近餐廳 救命晚餐',
+      desc: `火候還差得遠呢（目前熟度僅 ${t}%，未達 75% 黃金線）！鍋裡的【${panNames.join('、')}】生熟交雜散發出詭異紫光，記得開火煮熟再起鍋喔！`
+    };
+  }
+
+  const ids = state.panItems.map(e => e.item.id);
+  const exactCandidates = [];
+  const partialCandidates = [];
+
+  for (const r of RECIPES) {
+    const req = r.required || [];
+    const bonusPool = r.bonus || [];
+    const allowedSet = new Set([...req, ...bonusPool]);
+
+    const matchedReqCount = req.filter(k => ids.includes(k)).length;
+    const hasAllRequired = matchedReqCount === req.length;
+    const allPotItemsBelongToRecipe = ids.every(k => allowedSet.has(k));
+    const bonusMatches = bonusPool.filter(k => ids.includes(k)).length;
+
+    if (hasAllRequired && allPotItemsBelongToRecipe) {
+      const score = req.length * 15 + bonusMatches * 5 - Math.abs(ids.length - req.length);
+      exactCandidates.push({ recipe: r, score });
+    } else if (hasAllRequired) {
+      const score = req.length * 10 + bonusMatches * 3;
+      partialCandidates.push({ recipe: r, score });
+    }
+  }
+
+  if (exactCandidates.length > 0) {
+    exactCandidates.sort((a, b) => b.score - a.score);
+    return exactCandidates[0].recipe;
+  }
+
+  if (partialCandidates.length > 0) {
+    partialCandidates.sort((a, b) => b.score - a.score);
+    return partialCandidates[0].recipe;
+  }
+
+  // 針對特殊雙食材/多食材組合對應道地真實菜名、明確菜系與誘人介紹
+  const has = id => ids.includes(id);
+
+  if (has('crab') || has('octopus')) {
+    if (has('noodle')) {
+      return {
+        cuisine: '台式料理',
+        kcal: 790,
+        title: '漁港現撈海鮮炒烏龍',
+        sprite: 'dish_shacha_noodle',
+        query: '海鮮炒烏龍 台式熱炒',
+        desc: '大火快炒鎖住海味鮮甜，彈牙麵條吸飽滿滿海鮮高湯精華，鍋氣十足讓人一口接一口！'
+      };
+    }
+    if (has('tofu') || has('veggie') || has('pumpkin')) {
+      return {
+        cuisine: '日式料理',
+        kcal: 640,
+        title: '北海岸黃金海鮮寄世鍋',
+        sprite: 'dish_hotpot',
+        query: '日式海鮮火鍋',
+        desc: '甘甜昆布柴魚高湯慢熬現撈海味與時蔬，湯頭清澈鮮美、暖胃又滿足！'
+      };
+    }
+    return {
+      cuisine: '港式料理',
+      kcal: 720,
+      title: '避風塘蒜香爆炒海鮮煲',
+      sprite: 'dish_sanbei',
+      query: '避風塘炒蟹 港式熱炒',
+      desc: '金黃蒜酥與辛香料高溫爆香，將鮮甜海味緊緊鎖住，鹹香酥脆超下飯！'
+    };
+  }
+
+  if (has('bacon')) {
+    if (has('noodle')) {
+      return {
+        cuisine: '義式料理',
+        kcal: 840,
+        title: '羅馬風奶油培根蛋黃義大利麵',
+        sprite: 'dish_pasta',
+        query: '培根蛋黃義大利麵 義式餐廳',
+        desc: '煎至焦香脆口的厚切培根拌入濃郁蛋黃起司醬汁，均勻裹滿每一根彈牙直麵！'
+      };
+    }
+    if (has('rice')) {
+      return {
+        cuisine: '美式料理',
+        kcal: 810,
+        title: '美式煙燻培根起司鐵板炒飯',
+        sprite: 'dish_gratin',
+        query: '美式鐵板飯 美式餐廳',
+        desc: '煙燻培根逼出迷人油脂與粒粒分明的米飯大火翻炒，香氣撲鼻讓人停不下來！'
+      };
+    }
+    return {
+      cuisine: '美式料理',
+      kcal: 690,
+      title: '美式經典厚切培根早午餐拼盤',
+      sprite: 'dish_omelet_brunch',
+      query: '美式早午餐 培根拼盤',
+      desc: '焦香微脆的厚切培根搭配鮮嫩時蔬與金黃配菜，豐盛又充滿活力的一餐！'
+    };
+  }
+
+  if (has('pumpkin')) {
+    if (has('rice') || has('cheese')) {
+      return {
+        cuisine: '義式料理',
+        kcal: 730,
+        title: '金黃栗子南瓜奶油燉飯',
+        sprite: 'dish_gratin',
+        query: '南瓜燉飯 義式餐廳',
+        desc: '綿密香甜的栗子南瓜泥融入濃醇鮮奶油，米芯吸飽金黃醬汁，溫潤順口超療癒！'
+      };
+    }
+    return {
+      cuisine: '日式料理',
+      kcal: 490,
+      title: '和風高湯栗子南瓜蔬菜煮',
+      sprite: 'dish_hotpot',
+      query: '日式定食 家常料理',
+      desc: '以甘醇醬油與柴魚高湯細火慢燉，南瓜鬆軟清甜、入口即化，暖心又健康！'
+    };
+  }
+
+  if (has('mushroom')) {
+    if (has('noodle')) {
+      return {
+        cuisine: '台式料理',
+        kcal: 610,
+        title: '古早味紅蔥香菇肉燥乾拌麵',
+        sprite: 'dish_shacha_noodle',
+        query: '香菇肉燥麵 台灣小吃',
+        desc: '爆香紅蔥頭與厚實埔里香菇慢熬醬汁，拌入Q彈麵條鹹香回甘，最道地的台灣味！'
+      };
+    }
+    return {
+      cuisine: '台式料理',
+      kcal: 480,
+      title: '九層塔麻油三杯杏鮑菇煲',
+      sprite: 'dish_sanbei',
+      query: '三杯杏鮑菇 台式熱炒',
+      desc: '黑麻油煸香老薑與蒜頭，將多汁鮮菇收汁入味，起鍋前嗆入九層塔香氣逼人！'
+    };
+  }
+
+  if (has('onion')) {
+    if (has('beef') || has('pork')) {
+      return {
+        cuisine: '日式料理',
+        kcal: 750,
+        title: '日式甘甜洋蔥壽喜燒蓋飯',
+        sprite: 'dish_oyakodon',
+        query: '日式牛丼 壽喜燒丼',
+        desc: '焦糖化甜洋蔥與鮮嫩肉片在壽喜燒醬汁中慢煮入味，鋪在熱騰騰白飯上超級下飯！'
+      };
+    }
+    return {
+      cuisine: '法式料理',
+      kcal: 450,
+      title: '法式焦糖洋蔥起司濃湯盅',
+      sprite: 'dish_gratin',
+      query: '法式洋蔥湯 西餐廳',
+      desc: '細火慢炒至琥珀色的洋蔥熬出天然甘甜，覆蓋金黃焗烤起司，溫潤濃郁超暖胃！'
+    };
+  }
+
+  if (has('veggie')) {
+    return {
+      cuisine: '台式料理',
+      kcal: 360,
+      title: '蒜香大火快炒季節時蔬盤',
+      sprite: 'dish_hotpot',
+      query: '台式熱炒 炒青菜',
+      desc: '猛火快炒鎖住翠綠鮮甜與清脆口感，蒜香撲鼻、清爽解膩又營養均衡！'
+    };
+  }
+
+  // 依據主食材歸類到最貼切的真實菜系與道地料理名稱
+  const mainId = state.panItems[0].item.id;
+  const fallbackDishMap = {
+    beef: {
+      cuisine: '日式料理',
+      kcal: 790,
+      title: '和風壽喜燒嫩肩牛肉鍋',
+      sprite: 'dish_hotpot',
+      query: '日式壽喜燒 牛肉鍋',
+      desc: '油花均勻的嫩肩牛肉在甘甜壽喜燒醬汁中涮煮，肉汁飽滿、香氣四溢超滿足！'
+    },
+    chicken: {
+      cuisine: '台式料理',
+      kcal: 680,
+      title: '塔香三杯嫩雞腿砂鍋煲',
+      sprite: 'dish_sanbei',
+      query: '三杯雞 台式熱炒',
+      desc: '麻油、醬油與米酒黃金比例收汁，雞腿肉鮮嫩彈牙，九層塔香氣令人食指大動！'
+    },
+    pork: {
+      cuisine: '日式料理',
+      kcal: 740,
+      title: '薑汁燒肉和風定食拼盤',
+      sprite: 'dish_salmon_set',
+      query: '薑汁燒肉 日式定食',
+      desc: '現磨嫩薑與甘醇醬汁大火快煎五花肉片，鹹甜開胃、配白飯吃超級過癮！'
+    },
+    salmon: {
+      cuisine: '日式料理',
+      kcal: 620,
+      title: '鹽烤厚切挪威鮭魚定食',
+      sprite: 'dish_salmon_set',
+      query: '烤鮭魚定食 日式料理',
+      desc: '外皮微酥金黃、魚肉細嫩多汁，豐富油脂在口中化開，鮮美無比！'
+    },
+    shrimp: {
+      cuisine: '泰式料理',
+      kcal: 650,
+      title: '泰式酸辣香茅鮮蝦煲',
+      sprite: 'dish_sanbei',
+      query: '泰式鮮蝦 泰式料理',
+      desc: '肥美彈牙的鮮蝦吸附檸檬葉與香茅酸辣湯汁，開胃爽口、層次豐富！'
+    },
+    tomato: {
+      cuisine: '義式料理',
+      kcal: 580,
+      title: '拿坡里慢熬義式番茄燉菜',
+      sprite: 'dish_pasta',
+      query: '義式番茄燉菜 義式餐廳',
+      desc: '熟透牛番茄與羅勒葉慢火熬煮出自然酸甜果香，濃郁爽口又充滿地中海風情！'
+    },
+    noodle: {
+      cuisine: '台式料理',
+      kcal: 660,
+      title: '老師傅蔥油開陽拌麵',
+      sprite: 'dish_shacha_noodle',
+      query: '蔥油拌麵 台灣小吃',
+      desc: '金黃酥脆的紅蔥油拌入勁道十足的手工麵條，簡單純粹卻讓人回味無窮！'
+    },
+    rice: {
+      cuisine: '日式料理',
+      kcal: 540,
+      title: '柴魚高湯茶漬飯定食',
+      sprite: 'dish_onigiri',
+      query: '日式茶漬飯 日式料理',
+      desc: '熱騰騰的甘醇高湯沖入粒粒分明的越光米飯中，溫潤清爽、暖心又暖胃！'
+    },
+    cheese: {
+      cuisine: '義式料理',
+      kcal: 770,
+      title: '雙色乳酪黃金焗烤總匯',
+      sprite: 'dish_gratin',
+      query: '焗烤料理 義式餐廳',
+      desc: '香濃切達與莫札瑞拉雙色乳酪烤至金黃微焦，挖開瞬間牽絲濃郁超誘人！'
+    },
+    potato: {
+      cuisine: '美式料理',
+      kcal: 690,
+      title: '美式香草帶皮焗烤馬鈴薯',
+      sprite: 'dish_fish_chips',
+      query: '烤馬鈴薯 美式餐廳',
+      desc: '外皮微酥、內裡綿密鬆軟的馬鈴薯佐以奶油與迷迭香烘烤，香氣迷人！'
+    },
+    tofu: {
+      cuisine: '台式料理',
+      kcal: 440,
+      title: '紅燒家常老皮嫩肉豆腐煲',
+      sprite: 'dish_sundubu',
+      query: '老皮嫩肉 川菜台菜',
+      desc: '外層金黃微皺、內裡滑嫩如布丁的雞蛋豆腐吸飽紅燒醬汁，入口即化超下飯！'
+    },
+    corn: {
+      cuisine: '日式料理',
+      kcal: 420,
+      title: '北海道奶油醬油烤玉米',
+      sprite: 'dish_corn_butter',
+      query: '奶油玉米 日式居酒屋',
+      desc: '飽滿多汁的甜玉米刷上濃醇奶油與日式醬油炙烤，焦香四溢超涮嘴！'
+    },
+    egg: {
+      cuisine: '日式料理',
+      kcal: 380,
+      title: '京都風味高湯厚燒玉子燒',
+      sprite: 'dish_tamagoyaki',
+      query: '玉子燒 日式料理',
+      desc: '層層細心捲起的蓬鬆厚蛋燒，鎖住滿滿昆布柴魚高湯，軟嫩多汁超療癒！'
+    }
+  };
+
+  return fallbackDishMap[mainId] || {
+    cuisine: '台式料理',
+    kcal: 560,
+    title: '家常風味暖心砂鍋煲',
+    sprite: 'dish_hotpot',
+    query: '台式砂鍋 家常菜',
+    desc: '慢火細燉鎖住食材自然鮮甜，湯汁濃郁醇厚、暖胃又滿足的晚餐首選！'
+  };
+}
+
+function getStarRating(temp, isDeath) {
+  if (isDeath) return '★☆☆☆☆';
+  if (temp >= 78 && temp <= 88) return '★★★★★';
+  if (temp >= 75 && temp <= 94) return '★★★★☆';
+  return '★★★☆☆';
+}
+
+function setServeMysteryState() {
+  state.hasServedDish = false;
+  const box = $('ratingBox');
+  const badge = $('serveBadge');
+  const stars = $('starRating');
+  const aura = $('gachaAura');
+  const plate = $('purePlateArt');
+  const usedRow = $('usedIngRow');
+  const cuisineEl = $('resCuisine');
+  const kcalEl = $('resKcal');
+  const mapLink = $('mapSearchLink');
+
+  box.className = 'rating-box mystery';
+  badge.textContent = '⏳ 等待出鍋';
+  stars.textContent = '???';
+  stars.className = 'stars-row mystery';
+
+  aura.className = 'gacha-aura hidden';
+  plate.className = 'pure-plate empty-plate';
+  plate.innerHTML = '<span class="empty-plate-hint">空盤待上菜</span>';
+  usedRow.className = 'used-ingredients hidden';
+  usedRow.innerHTML = '';
+
+  cuisineEl.textContent = '????';
+  cuisineEl.className = 'cuisine-tag mystery';
+  kcalEl.textContent = '🔥 熱量：??? kcal';
+  kcalEl.className = 'kcal-badge mystery';
+  $('resDishName').textContent = '????';
+  $('resDishDesc').textContent = '將左側食材放入燉鍋並開火烹調，點擊「起鍋盛盤」即可揭曉今晚的美味料理！';
+  mapLink.href = '#';
+  mapLink.classList.add('disabled');
+}
+
+function clearPreviousServedDish() {
+  if (state.hasServedDish) {
+    setServeMysteryState();
+  }
+}
+
+function serveDish() {
+  SoundFX.autoUnlock();
+  if (state.panItems.length === 0) return;
+  stopFire();
+
+  const pot = $('potUnit');
+  pot.classList.add('opening');
+
+  const dish = matchDish();
+  const t = Math.round(state.temp);
+  const isDeath = Boolean(dish.isDeathDish);
+
+  if (isDeath) SoundFX.death();
+  else SoundFX.win();
+
+  setTimeout(() => {
+    pot.classList.remove('opening');
+    state.hasServedDish = true;
+
+    const box = $('ratingBox');
+    const badge = $('serveBadge');
+    const stars = $('starRating');
+    const aura = $('gachaAura');
+    const plate = $('purePlateArt');
+    const usedRow = $('usedIngRow');
+    const cuisineEl = $('resCuisine');
+    const kcalEl = $('resKcal');
+    const mapLink = $('mapSearchLink');
+
+    if (isDeath) {
+      box.className = 'rating-box death';
+      badge.textContent = t >= 100 ? '💀 100% 燒焦死神' : `💀 ${t}% 未熟死神`;
+      aura.className = 'gacha-aura death';
+      cuisineEl.className = 'cuisine-tag death';
+    } else {
+      box.className = 'rating-box';
+      badge.textContent = `★ 黃金熟度 ${t}%`;
+      aura.className = 'gacha-aura';
+      cuisineEl.className = 'cuisine-tag';
+    }
+
+    stars.textContent = getStarRating(t, isDeath);
+    stars.className = 'stars-row';
+    $('serveLocText').textContent = state.location;
+
+    plate.className = 'pure-plate';
+    plate.innerHTML = imgTag(dish.sprite, dish.title);
+    usedRow.className = 'used-ingredients';
+    usedRow.innerHTML = state.panItems.map(e => imgTag(e.item.sprite, e.item.name)).join('');
+
+    cuisineEl.textContent = dish.cuisine;
+    kcalEl.textContent = `🔥 熱量：${dish.kcal} kcal`;
+    kcalEl.className = 'kcal-badge';
+    $('resDishName').textContent = dish.title;
+    $('resDishDesc').textContent = dish.desc;
+    mapLink.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(state.location + ' ' + dish.query)}`;
+    mapLink.classList.remove('disabled');
+
+    $('cookView').classList.remove('active');
+    $('serveView').classList.add('active');
+  }, 460);
+}
+
+function resetKitchen(autoSpin = false) {
+  stopFire();
+  state.panItems = [];
+  state.temp = 0;
+  state.burnt = false;
+  state.warned = false;
+  state.reelsRolled = false;
+  state.hasServedDish = false;
+  for (let i = 0; i < 4; i++) setMysteryStrip(i);
+  $('potUnit').className = 'pot-unit';
+  $('thermoBox').className = 'thermo-box';
+  $('tempVal').textContent = '0°';
+  $('thermoFill').style.height = '0%';
+  updateReelsUI();
+  updatePotUI();
+  setServeMysteryState();
+  setHint('拉動左側拉桿轉出 4 種不同食材，點擊上方食材格放入燉鍋！', '');
+  if (autoSpin) spinReels();
+}
+
+/* ===== 4. 圖鑑管理（檢視、新增料理、刪除料理、恢復預設） ===== */
+function renderBook() {
+  const list = $('bookList');
+  $('bookCountTitle').textContent = `📖 料理圖鑑 (${RECIPES.length}道)`;
+
+  const filtered = state.bookCat === 'ALL'
+    ? RECIPES.map((r, idx) => ({ r, idx }))
+    : RECIPES.map((r, idx) => ({ r, idx })).filter(x => x.r.cuisine === state.bookCat);
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:16px;font-size:12px;color:var(--ink-soft)">此分類目前沒有料理，點擊上方「＋新增料理」來建立吧！</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(({ r, idx }) => {
+    const reqList = r.required || r.keys || [];
+    const ingNames = reqList.map(k => INGREDIENTS.find(i => i.id === k)?.name || k).join(' + ');
+    return `
+      <div class="recipe-row">
+        ${imgTag(r.sprite, r.title)}
+        <div class="recipe-meta">
+          <strong>${r.title}</strong>
+          <button class="del-recipe-btn" type="button" data-del-idx="${idx}">🗑 刪除</button>
+          <div class="recipe-tags">
+            <span class="mini-tag">${r.cuisine}</span>
+            <span class="mini-tag kcal">🔥 ${r.kcal} kcal</span>
+            <span class="mini-tag">必備：${ingNames}</span>
+          </div>
+          <div>${r.desc}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderNewDishIngPicker() {
+  const box = $('newDishIngPicker');
+  box.innerHTML = INGREDIENTS.map(ing => {
+    const picked = state.pickedNewIngs.includes(ing.id);
+    return `<button type="button" class="ing-pick-btn ${picked ? 'picked' : ''}" data-ing-id="${ing.id}">${ing.name}</button>`;
+  }).join('');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  buildAllSprites();
+  $('kitchenBgImg').src = SPRITES.kitchenBg;
+  $('logoChef').innerHTML = imgTag('chefHat', '廚師帽');
+  $('serveLogoChef').innerHTML = imgTag('chefHat', '廚師帽');
+  $('miniHat').innerHTML = imgTag('chefHat', 'COOK');
+  $('potLidArt').innerHTML = imgTag('potLid', '鍋蓋');
+  $('potBodyArt').innerHTML = imgTag('potBody', '燉鍋');
+
+  initReels();
+  updatePotUI();
+  setServeMysteryState();
+  renderBook();
+  renderNewDishIngPicker();
+
+  $('bgmBtn').addEventListener('click', () => SoundFX.toggle());
+  $('leverBtn').addEventListener('click', spinReels);
+  $('fireBtn').addEventListener('click', toggleFire);
+  $('resetBtn').addEventListener('click', () => { SoundFX.click(); resetKitchen(false); });
+  $('serveBtn').addEventListener('click', serveDish);
+  $('quickCookTitle').addEventListener('click', () => { SoundFX.click(); resetKitchen(true); });
+
+  $('backCookBtn').addEventListener('click', () => {
+    SoundFX.click();
+    $('serveView').classList.remove('active');
+    $('cookView').classList.add('active');
+    resetKitchen(false);
+  });
+
+  // 地區設定彈窗（雙畫面皆可開啟並自由輸入）
+  const openLocModal = () => {
+    SoundFX.click();
+    $('locInput').value = state.location;
+    $('locModal').classList.add('open');
+  };
+  $('openLocBtn').addEventListener('click', openLocModal);
+  $('serveLocBtn').addEventListener('click', openLocModal);
+  $('closeLocBtn').addEventListener('click', () => $('locModal').classList.remove('open'));
+  document.querySelectorAll('.chip').forEach(btn => {
+    btn.addEventListener('click', () => { $('locInput').value = btn.dataset.loc; });
+  });
+  $('saveLocBtn').addEventListener('click', () => {
+    const val = $('locInput').value.trim();
+    if (val) {
+      state.location = val;
+      $('locText').textContent = val;
+      $('serveLocText').textContent = val;
+      $('locModal').classList.remove('open');
+      SoundFX.click();
+    }
+  });
+
+  // 食譜圖鑑彈窗（新增 / 刪除 / 篩選 / 恢復預設）
+  const openBookModal = () => {
+    SoundFX.click();
+    renderBook();
+    $('bookModal').classList.add('open');
+  };
+  $('openBookBtn').addEventListener('click', openBookModal);
+  $('closeBookBtn').addEventListener('click', () => $('bookModal').classList.remove('open'));
+
+  $('toggleAddFormBtn').addEventListener('click', () => {
+    $('addDishForm').classList.toggle('open');
+    SoundFX.click();
+  });
+
+  $('newDishIngPicker').addEventListener('click', e => {
+    const btn = e.target.closest('.ing-pick-btn');
+    if (!btn) return;
+    const id = btn.dataset.ingId;
+    const pos = state.pickedNewIngs.indexOf(id);
+    if (pos !== -1) state.pickedNewIngs.splice(pos, 1);
+    else if (state.pickedNewIngs.length < 4) state.pickedNewIngs.push(id);
+    renderNewDishIngPicker();
+    SoundFX.click();
+  });
+
+  $('saveNewDishBtn').addEventListener('click', () => {
+    const title = $('newDishTitle').value.trim();
+    if (!title) return;
+    const reqs = state.pickedNewIngs.length > 0 ? [...state.pickedNewIngs] : ['egg'];
+    const cuisine = $('newDishCuisine').value;
+    const kcal = Math.max(50, Number($('newDishKcal').value) || 600);
+    const sprite = $('newDishSprite').value;
+    const desc = $('newDishDesc').value.trim() || `慢火細心烹調而成的招牌「${title}」，香氣四溢、美味滿分！`;
+
+    RECIPES.unshift({
+      cuisine,
+      kcal,
+      required: reqs,
+      bonus: INGREDIENTS.map(i => i.id),
+      title,
+      sprite,
+      query: title,
+      desc
+    });
+    saveRecipes(RECIPES);
+    $('newDishTitle').value = '';
+    $('newDishDesc').value = '';
+    state.pickedNewIngs = [];
+    renderNewDishIngPicker();
+    $('addDishForm').classList.remove('open');
+    renderBook();
+    SoundFX.win();
+  });
+
+  $('bookList').addEventListener('click', e => {
+    const delBtn = e.target.closest('.del-recipe-btn');
+    if (!delBtn) return;
+    const idx = Number(delBtn.dataset.delIdx);
+    if (!Number.isNaN(idx) && RECIPES[idx]) {
+      RECIPES.splice(idx, 1);
+      saveRecipes(RECIPES);
+      renderBook();
+      SoundFX.remove();
+    }
+  });
+
+  $('restoreBookBtn').addEventListener('click', () => {
+    RECIPES = JSON.parse(JSON.stringify(DEFAULT_RECIPES));
+    saveRecipes(RECIPES);
+    renderBook();
+    SoundFX.click();
+  });
+
+  $('filterBar').addEventListener('click', e => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.bookCat = btn.dataset.cat;
+    renderBook();
+    SoundFX.click();
+  });
+});
+</script>
+</body>
+</html>
